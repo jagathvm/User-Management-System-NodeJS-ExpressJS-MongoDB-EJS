@@ -45,7 +45,7 @@ app.post("/login", async (req, res) => {
     if (user.password === password) {
       res.status(200).render("home");
     } else {
-      res.status(401).send("Passwords do not match");
+      res.status(404).send("Passwords do not match");
     }
   } catch (error) {
     console.log(`Error in /login route: ${error}`);
