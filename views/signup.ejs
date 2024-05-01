@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SignUp</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./stylesheets/styles.css">
 </head>
 
 <body>
     <div class="wrapper sign-up">
         <!-- Sign Up -->
         <div class="form-wrapper sign-up">
-            <form id="formSignUp" action="/submit" method="post">
+            <form id="formSignUp" action="" method="post">
                 <h2>Sign Up</h2>
                 <div class="input-group">
                     <input autocomplete="off" type="email" id="email" name="email" required>
@@ -44,6 +44,22 @@
             </form>
         </div>
     </div>
+
+    <script>
+        const formSignUp = document.getElementById('formSignUp');
+        form.addEventListener('submit', async (e) => {
+            const formData = new FormData(formSignUp);
+            const data = Object.fromEntries(formData);
+
+            await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+        });
+    </script>
 </body>
 
 </html>
