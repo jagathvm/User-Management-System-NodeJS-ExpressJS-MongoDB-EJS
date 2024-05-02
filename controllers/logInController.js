@@ -8,7 +8,6 @@ exports.logIn = async (req, res) => {
     if (!user) {
       return res.status(400).send("User Not Found!");
     }
-    console.log(password, user.password);
     if (await bcrypt.compare(password, user.password)) {
       res.status(200).render("home");
     } else {
