@@ -3,7 +3,6 @@ const { usersCollection } = require("../db");
 exports.logIn = async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const user = await usersCollection.findOne({ username: username });
     if (!user) {
       res.status(404).send("User Not Found!");

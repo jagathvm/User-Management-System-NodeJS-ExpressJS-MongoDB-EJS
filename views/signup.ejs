@@ -45,21 +45,7 @@
         </div>
     </div>
 
-    <script>
-        const formSignUp = document.getElementById('formSignUp');
-        form.addEventListener('submit', async (e) => {
-            const formData = new FormData(formSignUp);
-            const data = Object.fromEntries(formData);
-
-            await fetch('/api/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-        });
-    </script>
+    <script src="./scripts/signUp.js"></script>
 </body>
 
 </html>
