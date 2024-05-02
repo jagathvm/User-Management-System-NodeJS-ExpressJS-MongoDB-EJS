@@ -1,4 +1,5 @@
 const { usersCollection } = require("../db");
+const bcrypt = require("bcrypt");
 
 exports.signUp = async (req, res) => {
   try {
@@ -9,10 +10,11 @@ exports.signUp = async (req, res) => {
       return;
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     await usersCollection.insertOne({
       email,
       username,
-      password,
+      password: hashedPassword,
     });
 
     res.status(201).redirect("/");

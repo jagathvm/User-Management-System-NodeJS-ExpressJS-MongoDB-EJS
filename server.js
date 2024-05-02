@@ -24,12 +24,12 @@ app.get("/signup", (req, res) => {
   res.status(200).render("signup");
 });
 
-app.use("/", logInRoutes);
-app.use("/signup", signUpRoutes);
-
 app.get("/logout", (req, res) => {
   res.redirect("/");
 });
+
+app.use("/", logInRoutes);
+app.use("/signup", signUpRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at Port ${PORT}`);
