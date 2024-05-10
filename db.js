@@ -1,6 +1,5 @@
 const { MongoClient } = require("mongodb");
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config();
 
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
@@ -16,6 +15,7 @@ const connectToDB = async () => {
 };
 
 const db = client.db("CRUD_Project");
+const adminCollection = db.collection("admin");
 const usersCollection = db.collection("users");
 
-module.exports = { client, usersCollection, connectToDB };
+module.exports = { client, adminCollection, usersCollection, connectToDB };

@@ -1,8 +1,8 @@
 const express = require("express");
 const path = require("path");
 const { connectToDB } = require("./db");
-const logInRoutes = require("./routes/logInRoutes");
-const signUpRoutes = require("./routes/signUpRoutes");
+const userRoutes = require("./server/routes/userRoutes");
+const adminRoutes = require("./server/routes/adminRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,24 +12,30 @@ connectToDB();
 
 app.set("view engine", "ejs");
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
 
-app.get("/", (req, res) => {
-  res.status(200).render("login");
+app.get("/api/user/", (req, res) => {
+  res.status(200).render("userLogin");
 });
 
-app.get("/signup", (req, res) => {
-  res.status(200).render("signup");
+app.get("/api/user/signup", (req, res) => {
+  res.status(200).render("userSignup");
 });
 
 app.get("/logout", (req, res) => {
-  res.redirect("/");
+  res.redirect("/api/user/");
 });
 
-app.use("/", logInRoutes);
-app.use("/signup", signUpRoutes);
+app.get("/api/admin/", (req, res) => {
+  res.status(200).render("adminLogin");
+});
+
+app.use("/", userRoutes);
+app.use("/signup", userRoutes);
+
+app.use("/", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at Port ${PORT}`);
