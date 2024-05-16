@@ -1,4 +1,5 @@
 const express = require("express");
+const expressLayout = require("express-ejs-layouts");
 const path = require("path");
 const { connectToDB } = require("./db");
 const userRoutes = require("./server/routes/userRoutes");
@@ -16,14 +17,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/user/", (req, res) => {
-  res.status(200).render("userLogin");
-});
-
-app.get("/api/user/signup", (req, res) => {
-  res.status(200).render("userSignup");
-});
-
 app.get("/logout", (req, res) => {
   res.redirect("/api/user/");
 });
@@ -33,8 +26,6 @@ app.get("/api/admin/", (req, res) => {
 });
 
 app.use("/", userRoutes);
-app.use("/signup", userRoutes);
-
 app.use("/", adminRoutes);
 
 app.listen(PORT, () => {

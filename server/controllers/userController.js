@@ -1,6 +1,14 @@
 const { usersCollection } = require("../../db");
 const bcrypt = require("bcrypt");
 
+exports.loginPage = (req, res) => {
+  res.status(200).render("userLogin");
+};
+
+exports.signupPage = (req, res) => {
+  res.status(200).render("userSignup");
+};
+
 exports.userLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -35,7 +43,7 @@ exports.userSignup = async (req, res) => {
       password: hashedPassword,
     });
 
-    res.status(201).redirect("/");
+    res.status(201).redirect("/api/user/");
   } catch (error) {
     console.error(`Error in /submit route: ${error}`);
     res.status(500).send(`Internal Server Error`);

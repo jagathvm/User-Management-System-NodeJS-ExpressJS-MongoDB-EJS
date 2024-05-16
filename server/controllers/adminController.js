@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 exports.adminLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const admin = await adminCollection.findOne({
       username: username,
     });

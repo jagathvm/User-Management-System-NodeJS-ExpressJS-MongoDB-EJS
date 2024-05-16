@@ -2,7 +2,7 @@
   "name": "js-crashcourse-netninja",
   "version": "1.0.0",
   "description": "",
-  "main": "global.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
@@ -19,6 +19,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-ejs-layouts": "^2.5.1",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.5.0"
   }

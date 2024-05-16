@@ -1,6 +1,6 @@
 const formSignIn = document.getElementById("formSignIn");
 
-form.addEventListener("submit", async (e) => {
+formSignIn.addEventListener("submit", async (e) => {
   const formData = new FormData(formSignIn);
   const data = Object.fromEntries(formData);
   await fetch("/api/admin/", {
