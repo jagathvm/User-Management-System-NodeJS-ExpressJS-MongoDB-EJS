@@ -1,5 +1,4 @@
 const express = require("express");
-const expressLayout = require("express-ejs-layouts");
 const path = require("path");
 const { connectToDB } = require("./db");
 const userRoutes = require("./server/routes/userRoutes");
@@ -11,15 +10,15 @@ const PORT = process.env.PORT || 3000;
 // Connect to the Database
 connectToDB();
 
+// Templating Engine
 app.set("view engine", "ejs");
 
+// Static Files
 app.use(express.static(path.join(__dirname, "public")));
+
+// Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/logout", (req, res) => {
-  res.redirect("/api/user/");
-});
 
 app.get("/api/admin/", (req, res) => {
   res.status(200).render("adminLogin");

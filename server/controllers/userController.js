@@ -49,3 +49,7 @@ exports.userSignup = async (req, res) => {
     res.status(500).send(`Internal Server Error`);
   }
 };
+
+exports.userLogout = async (req, res) => {
+  res.redirect("/api/user/");
+};

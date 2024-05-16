@@ -21,3 +21,7 @@ exports.adminLogin = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+exports.adminLogout = async (req, res) => {
+  res.redirect("/api/admin/");
+};
