@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogIn</title>
+    <title>Admin SignIn</title>
     <link rel="stylesheet" href="/stylesheets/styles.css">
 </head>
 
@@ -13,10 +13,10 @@
         <!-- Sign In -->
         <div class="form-wrapper sign-in">
             <form id="formSignIn" action="" method="post">
-                <h2>Login</h2>
+                <h2>ADMIN Sign In</h2>
                 <div class="input-group">
-                    <input type="text" name="username" required>
-                    <label for="username">Username</label>
+                    <input type="email" name="email" required>
+                    <label for="email">Email</label>
                 </div>
                 <div class="input-group">
                     <input type="password" name="password" required>
@@ -28,15 +28,12 @@
                         Remember Me
                     </label>
                 </div>
-                <button type="submit">Login</button>
-                <div class="signUp-Link">
-                    <p>Don't have an account? <a href="/api/user/signup" class="signUpBtn-Link">Sign Up</a></p>
-                </div>
+                <button type="submit">Sign In</button>
             </form>
         </div>
     </div>
 
-    <script src="/scripts/user.js"></script>
+    <script src="/scripts/admin/adminSignIn.js"></script>
 </body>
 
 </html>
