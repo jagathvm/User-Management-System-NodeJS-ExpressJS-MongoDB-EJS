@@ -7,7 +7,7 @@ router.post("/api/admin/", adminController.adminSignIn);
 
 router.get("/api/admin/dashboard", adminController.dashboard);
 router.get("/api/admin/dashboard/about", adminController.about);
-router.get("/logout", adminController.adminLogout);
+router.get("/api/admin/dashboard/logout", adminController.adminLogout);
 
 router.get("/api/admin/dashboard/addUser", adminController.addUser);
 router.post("/api/admin/dashboard/postUser", adminController.postUser);
