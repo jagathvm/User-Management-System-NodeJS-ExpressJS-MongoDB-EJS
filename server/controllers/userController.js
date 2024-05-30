@@ -38,7 +38,7 @@ exports.userLogin = async (req, res) => {
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
 
-      res.redirect("/api/user/home");
+      res.status(200).redirect("/api/user/home");
     } else {
       return res.status(404).send("Wrong Password");
     }
@@ -84,8 +84,6 @@ exports.authenticateToken = (req, res, next) => {
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    console.log(user);
-
     if (err) return res.sendStatus(403);
     req.user = user;
     next();

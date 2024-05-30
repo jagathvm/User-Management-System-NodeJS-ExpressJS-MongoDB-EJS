@@ -1,6 +1,7 @@
 const { adminCollection, usersCollection } = require("../config/db");
 const { ObjectId } = require("mongodb");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 /*
  * GET /api/admin/
@@ -23,7 +24,6 @@ exports.adminSignInPage = async (req, res) => {
 exports.adminSignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // console.log(req.body);
     const admin = await adminCollection.findOne({
       email: email,
     });
@@ -32,6 +32,13 @@ exports.adminSignIn = async (req, res) => {
       return res.status(400).send("Admin Not Found!");
     }
     if (await bcrypt.compare(password, admin.password)) {
+      // Generate JWT Token
+      const accessToken = generateAccessToken(admin);
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+
       res.status(200).redirect("/api/admin/dashboard");
     } else {
       return res.status(404).send("Wrong Password");
@@ -89,7 +96,7 @@ exports.about = async (req, res) => {
   };
 
   try {
-    res.status(200).render("user/about", locals);
+    res.status(200).render("admin/about", locals);
   } catch (error) {
     console.error(error);
   }
@@ -105,7 +112,7 @@ exports.addUser = async (req, res) => {
     title: "Add New User - Node.js",
     description: "Nodejs USER Management System",
   };
-  res.status(200).render("user/addUser", { locals });
+  res.status(200).render("admin/addUser", { locals });
 };
 
 /*
@@ -150,7 +157,7 @@ exports.viewUser = async (req, res) => {
     const user = await usersCollection.findOne({
       _id: new ObjectId(req.params.id),
     });
-    res.status(200).render("user/viewUser", { locals, user });
+    res.status(200).render("admin/viewUser", { locals, user });
   } catch (error) {
     console.error(error);
   }
@@ -173,7 +180,7 @@ exports.editUser = async (req, res) => {
       _id: new ObjectId(userId),
     });
 
-    res.status(200).render("user/editUser", { locals, user });
+    res.status(200).render("admin/editUser", { locals, user });
   } catch (error) {
     console.error(error);
     res.status(500).redirect("/api/admin/dashboard");
@@ -263,7 +270,7 @@ exports.searchUser = async (req, res) => {
 
     // console.log(users);
 
-    res.render("user/searchUser", { locals, users });
+    res.render("admin/searchUser", { locals, users });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
@@ -271,5 +278,24 @@ exports.searchUser = async (req, res) => {
 };
 
 exports.adminLogout = async (req, res) => {
-  res.redirect("/api/admin/");
+  // Clear JWT token cookie
+
+  res.clearCookie("accessToken").redirect("/api/admin/");
 };
+
+exports.authenticateToken = (req, res, next) => {
+  const token = req.cookies?.accessToken;
+  if (!token) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
+    if (err) return res.sendStatus(403);
+    req.admin = admin;
+    next();
+  });
+};
+
+function generateAccessToken(admin) {
+  return jwt.sign(admin, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "15m",
+  });
+}
