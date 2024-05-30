@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const expressLayout = require("express-ejs-layouts");
 const path = require("path");
 const { connectToDB } = require("./server/config/db");
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Middlewares
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // User and Admin Routes
