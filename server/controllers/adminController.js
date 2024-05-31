@@ -123,7 +123,6 @@ exports.addUser = async (req, res) => {
 exports.postUser = async (req, res) => {
   try {
     const { firstName, lastName, email, tel } = req.body;
-    // console.log(req.body);
 
     const result = await usersCollection.insertOne({
       firstName,
@@ -222,7 +221,6 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
 
   try {
     const result = await usersCollection.deleteOne({
@@ -281,17 +279,6 @@ exports.adminLogout = async (req, res) => {
   // Clear JWT token cookie
 
   res.clearCookie("accessToken").redirect("/api/admin/");
-};
-
-exports.authenticateToken = (req, res, next) => {
-  const token = req.cookies?.accessToken;
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
-    if (err) return res.sendStatus(403);
-    req.admin = admin;
-    next();
-  });
 };
 
 function generateAccessToken(admin) {

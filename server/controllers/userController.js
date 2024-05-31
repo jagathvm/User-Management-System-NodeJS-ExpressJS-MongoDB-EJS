@@ -16,7 +16,6 @@ exports.about = (req, res) => {
 
 exports.homePage = (req, res) => {
   const user = req.user;
-  console.log(user.firstName, user.lastName);
   res.status(200).render("user/home", {
     firstName: user.firstName,
     lastName: user.lastName,
@@ -77,17 +76,6 @@ exports.userSignup = async (req, res) => {
 exports.userLogout = async (req, res) => {
   // Clear JWT token cookie
   res.clearCookie("accessToken").redirect("/api/user/");
-};
-
-exports.authenticateToken = (req, res, next) => {
-  const token = req.cookies?.accessToken;
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
 };
 
 function generateAccessToken(user) {
