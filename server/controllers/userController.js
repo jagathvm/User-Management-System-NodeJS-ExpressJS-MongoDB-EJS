@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { getUsersCollection } from "../config/db";
+import { getUsersCollection } from "../config/db.js";
 
 const loginPage = (req, res) => {
   res.status(200).render("user/userSignIn");

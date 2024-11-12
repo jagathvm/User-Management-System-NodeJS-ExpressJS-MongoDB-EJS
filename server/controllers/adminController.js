@@ -291,7 +291,6 @@ export {
   adminSignInPage,
   dashboard,
   about,
-  addUserPage,
   addUser,
   postUser,
   viewUser,

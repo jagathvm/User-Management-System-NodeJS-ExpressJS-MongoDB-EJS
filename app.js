@@ -1,7 +1,10 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import expressEjsLayouts from "express-ejs-layouts";
+import cookieParser from "cookie-parser";
+
 import path from "path";
+import { fileURLToPath } from "url";
+
 import { connectToDB } from "./server/config/db.js";
 
 // Routes
@@ -10,6 +13,9 @@ import adminRoutes from "./server/routes/adminRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Connect to the Database
 connectToDB();

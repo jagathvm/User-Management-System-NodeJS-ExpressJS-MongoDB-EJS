@@ -5,8 +5,8 @@ import * as adminController from "../controllers/adminController.js";
 
 const router = Router();
 
-router.get("/api/admin/", adminController.adminSignInPage);
-router.post("/api/admin/", adminController.adminSignIn);
+router.get("/api/admin", adminController.adminSignInPage);
+router.post("/api/admin", adminController.adminSignIn);
 
 router.use(noCache, authenticateToken);
 
