@@ -51,12 +51,10 @@ const userSignup = async (req, res) => {
   const { firstName, lastName, tel, email, password, passwordConfirm } =
     req.body;
 
-  if (password !== passwordConfirm) {
-    res.status(401).send("Passwords Do not match");
-    return;
-  }
-
   try {
+    if (password !== passwordConfirm)
+      return res.status(401).send("Passwords Do not match");
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await getUsersCollection.insertOne({
       firstName,
