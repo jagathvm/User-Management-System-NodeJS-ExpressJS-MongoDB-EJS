@@ -1,21 +1,30 @@
-const { MongoClient } = require("mongodb");
-require("dotenv").config();
+import "dotenv/config";
+import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+let db;
+const client = new MongoClient(process.env.MONGO_URI);
 
 // Connect to MongoDB
 const connectToDB = async () => {
-  try {
-    await client.connect();
-    console.log(`Connected to MongoDB: ${client.options.hosts[0].host}`);
-  } catch (err) {
-    console.log(`Error connecting to MongoDB: ${err}`);
+  if (!db) {
+    try {
+      await client.connect();
+      db = client.db(process.env.DB_NAME);
+      console.log(`Connected to MongoDB`);
+    } catch (err) {
+      console.log(`Error connecting to MongoDB: ${err}`);
+      throw err;
+    }
   }
+  return db;
 };
 
-const db = client.db("CRUD_Project");
-const adminCollection = db.collection("admin");
-const usersCollection = db.collection("users");
+const getCollection = async (collectionName) => {
+  const db = await connectToDB();
+  return db.collection(collectionName);
+};
 
-module.exports = { client, adminCollection, usersCollection, connectToDB };
+const getAdminCollection = await getCollection("admin");
+const getUsersCollection = await getCollection("users");
+
+export { connectToDB, getAdminCollection, getUsersCollection };
