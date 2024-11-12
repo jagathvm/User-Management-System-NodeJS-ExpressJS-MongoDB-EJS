@@ -1,7 +1,7 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { adminCollection, usersCollection } = require("../config/db");
 const { ObjectId } = require("mongodb");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 /*
  * GET /api/admin/
