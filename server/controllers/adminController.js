@@ -1,14 +1,14 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const { adminCollection, usersCollection } = require("../config/db");
-const { ObjectId } = require("mongodb");
+import { ObjectId } from "mongodb";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { getAdminCollection, getUsersCollection } from "../config/db.js";
 
 /*
  * GET /api/admin/
  * Sign In
  */
 
-exports.adminSignInPage = async (req, res) => {
+const adminSignInPage = async (req, res) => {
   try {
     res.status(200).render("admin/adminSignIn");
   } catch (error) {
@@ -21,11 +21,11 @@ exports.adminSignInPage = async (req, res) => {
  * Sign In
  */
 
-exports.adminSignIn = async (req, res) => {
+const adminSignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const admin = await adminCollection.findOne({
-      email: email,
+    const admin = await getAdminCollection.findOne({
+      email,
     });
 
     if (!admin) {
@@ -54,7 +54,7 @@ exports.adminSignIn = async (req, res) => {
  * dashboard
  */
 
-exports.dashboard = async (req, res) => {
+const dashboard = async (req, res) => {
   const locals = {
     title: "Admin Dashboard - Node.js",
     description: "Nodejs USER Management System",
@@ -64,14 +64,14 @@ exports.dashboard = async (req, res) => {
   let page = req.query.page || 1;
 
   try {
-    const users = await usersCollection
+    const users = await getUsersCollection
       .find()
       .sort({ firstName: 1 })
       .skip(perPage * page - perPage)
       .limit(perPage)
       .toArray();
 
-    const usersCount = await usersCollection.countDocuments();
+    const usersCount = await getUsersCollection.countDocuments();
 
     res.status(200).render("admin/dashboard", {
       locals,
@@ -89,7 +89,7 @@ exports.dashboard = async (req, res) => {
  * About
  */
 
-exports.about = async (req, res) => {
+const about = async (req, res) => {
   const locals = {
     title: "About - Node.js",
     description: "Nodejs USER Management System",
@@ -107,7 +107,7 @@ exports.about = async (req, res) => {
  * New User Form
  */
 
-exports.addUser = async (req, res) => {
+const addUser = async (req, res) => {
   const locals = {
     title: "Add New User - Node.js",
     description: "Nodejs USER Management System",
@@ -120,11 +120,11 @@ exports.addUser = async (req, res) => {
  * Create New User
  */
 
-exports.postUser = async (req, res) => {
+const postUser = async (req, res) => {
   try {
     const { firstName, lastName, email, tel } = req.body;
 
-    const result = await usersCollection.insertOne({
+    const result = await getUsersCollection.insertOne({
       firstName,
       lastName,
       email,
@@ -146,14 +146,14 @@ exports.postUser = async (req, res) => {
  * View User
  */
 
-exports.viewUser = async (req, res) => {
+const viewUser = async (req, res) => {
   const locals = {
     title: "View User - Node.js",
     description: "Nodejs USER Management System",
   };
 
   try {
-    const user = await usersCollection.findOne({
+    const user = await getUsersCollection.findOne({
       _id: new ObjectId(req.params.id),
     });
     res.status(200).render("admin/viewUser", { locals, user });
@@ -167,7 +167,7 @@ exports.viewUser = async (req, res) => {
  * Edit User Page
  */
 
-exports.editUser = async (req, res) => {
+const editUser = async (req, res) => {
   const userId = req.params.id;
   const locals = {
     title: "Edit User - Node.js",
@@ -175,7 +175,7 @@ exports.editUser = async (req, res) => {
   };
 
   try {
-    const user = await usersCollection.findOne({
+    const user = await getUsersCollection.findOne({
       _id: new ObjectId(userId),
     });
 
@@ -191,7 +191,7 @@ exports.editUser = async (req, res) => {
  * Update User
  */
 
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   const userId = req.params.id;
 
   try {
@@ -202,7 +202,7 @@ exports.updateUser = async (req, res) => {
       tel: req.body.tel,
     };
 
-    await usersCollection.findOneAndUpdate(
+    await getUsersCollection.findOneAndUpdate(
       { _id: new ObjectId(userId) },
       { $set: updateData }
     );
@@ -219,11 +219,11 @@ exports.updateUser = async (req, res) => {
  * Delete User
  */
 
-exports.deleteUser = async (req, res) => {
+const deleteUser = async (req, res) => {
   const userId = req.params.id;
 
   try {
-    const result = await usersCollection.deleteOne({
+    const result = await getUsersCollection.deleteOne({
       _id: new ObjectId(userId),
     });
 
@@ -240,7 +240,7 @@ exports.deleteUser = async (req, res) => {
  * Search User
  */
 
-exports.searchUser = async (req, res) => {
+const searchUser = async (req, res) => {
   const locals = {
     title: "Search User - Node.js",
     description: "Nodejs USER Management System",
@@ -249,7 +249,7 @@ exports.searchUser = async (req, res) => {
     const searchTerm = req.body.searchTerm;
     const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9]/g, "");
 
-    const users = await usersCollection
+    const users = await getUsersCollection
       .find({
         $or: [
           { firstName: { $regex: new RegExp(searchNoSpecialChar, "i") } },
@@ -275,9 +275,8 @@ exports.searchUser = async (req, res) => {
   }
 };
 
-exports.adminLogout = async (req, res) => {
+const adminLogout = async (req, res) => {
   // Clear JWT token cookie
-
   res.clearCookie("accessToken").redirect("/api/admin/");
 };
 
@@ -286,3 +285,19 @@ function generateAccessToken(admin) {
     expiresIn: "15m",
   });
 }
+
+export {
+  adminSignIn,
+  adminSignInPage,
+  dashboard,
+  about,
+  addUserPage,
+  addUser,
+  postUser,
+  viewUser,
+  editUser,
+  updateUser,
+  deleteUser,
+  searchUser,
+  adminLogout,
+};
