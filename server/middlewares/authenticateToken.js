@@ -2,10 +2,10 @@ import jwt from "jsonwebtoken";
 
 const authenticateToken = (req, res, next) => {
   // Get the JWT token from the request cookies
-  const { token } = req.cookies;
-  if (!token) return res.sendStatus(401);
+  const { accessToken } = req.cookies;
+  if (!accessToken) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
     req.user = user;
     next();

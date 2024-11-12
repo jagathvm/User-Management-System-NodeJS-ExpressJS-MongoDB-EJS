@@ -43,8 +43,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // User and Admin Routes
-app.use("/", userRoutes);
-app.use("/", adminRoutes);
+app.use("/api/user/", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running at Port ${PORT}`);

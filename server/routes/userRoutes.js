@@ -5,15 +5,15 @@ import * as userController from "../controllers/userController.js";
 
 const router = Router();
 
-router.get("/api/user/", userController.loginPage);
-router.get("/api/user/signup", userController.signupPage);
-router.get("/api/user/logout", userController.userLogout);
+router.get("/", userController.loginPage);
+router.get("/signup", userController.signupPage);
+router.get("/logout", userController.userLogout);
 
-router.post("/api/user/", userController.userLogin);
-router.post("/api/user/signup", userController.userSignup);
+router.post("/", userController.userLogin);
+router.post("/signup", userController.userSignup);
 
 router.use(noCache, authenticateToken);
-router.get("/api/user/home", userController.homePage);
-router.get("/api/user/about", userController.about);
+router.get("/home", userController.homePage);
+router.get("/about", userController.about);
 
 export default router;

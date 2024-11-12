@@ -28,9 +28,8 @@ const adminSignIn = async (req, res) => {
       email,
     });
 
-    if (!admin) {
-      return res.status(400).send("Admin Not Found!");
-    }
+    if (!admin) return res.status(400).send("Invalid username or password");
+
     if (await bcrypt.compare(password, admin.password)) {
       // Generate JWT Token
       const accessToken = generateAccessToken(admin);
@@ -41,7 +40,7 @@ const adminSignIn = async (req, res) => {
 
       res.status(200).redirect("/api/admin/dashboard");
     } else {
-      return res.status(404).send("Wrong Password");
+      return res.status(404).send("Invalid username or password");
     }
   } catch (error) {
     console.log(`Error in /admin/ route: ${error}`);
