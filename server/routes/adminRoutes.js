@@ -1,53 +1,27 @@
-const express = require("express");
-const router = express.Router();
-const {
-  adminSignIn,
-  adminSignInPage,
-  dashboard,
-  about,
-  adminLogout,
-  addUser,
-  postUser,
-  searchUser,
-  viewUser,
-  editUser,
-  updateUser,
-  deleteUser,
-} = require("../controllers/adminController");
+import { Router } from "express";
+import { authenticateToken } from "../middlewares/authenticateToken.js";
+import { noCache } from "../middlewares/noCache";
+import * as adminController from "../controllers/adminController.js";
 
-const authenticateToken = require("../middlewares/authenticateToken");
-const noCache = require("../middlewares/noCache");
+const router = Router();
 
-router.get("/api/admin/", adminSignInPage);
-router.post("/api/admin/", adminSignIn);
+router.get("/api/admin/", adminController.adminSignInPage);
+router.post("/api/admin/", adminController.adminSignIn);
 
-router.get("/api/admin/dashboard", noCache, authenticateToken, dashboard);
-router.get("/api/admin/dashboard/about", noCache, authenticateToken, about);
-router.get(
-  "/api/admin/dashboard/logout",
-  noCache,
-  authenticateToken,
-  adminLogout
-);
+router.use(noCache, authenticateToken);
 
-router.get("/api/admin/dashboard/addUser", noCache, authenticateToken, addUser);
-router.post("/api/admin/dashboard/postUser", postUser);
-router.post("/api/admin/dashboard/searchUser", searchUser);
+router.get("/api/admin/dashboard", adminController.dashboard);
+router.get("/api/admin/dashboard/about", adminController.about);
+router.get("/api/admin/dashboard/logout", adminController.adminLogout);
 
-router.get(
-  "/api/admin/dashboard/view/:id",
-  noCache,
-  authenticateToken,
-  viewUser
-);
-router.get(
-  "/api/admin/dashboard/edit/:id",
-  noCache,
-  authenticateToken,
-  editUser
-);
+router.get("/api/admin/dashboard/addUser", adminController.addUser);
+router.post("/api/admin/dashboard/postUser", adminController.postUser);
+router.post("/api/admin/dashboard/searchUser", adminController.searchUser);
 
-router.put("/api/admin/dashboard/edit/:id", updateUser);
-router.delete("/api/admin/dashboard/edit/:id", deleteUser);
+router.get("/api/admin/dashboard/view/:id", adminController.viewUser);
+router.get("/api/admin/dashboard/edit/:id", adminController.editUser);
 
-module.exports = router;
+router.put("/api/admin/dashboard/edit/:id", adminController.updateUser);
+router.delete("/api/admin/dashboard/edit/:id", adminController.deleteUser);
+
+export default router;
