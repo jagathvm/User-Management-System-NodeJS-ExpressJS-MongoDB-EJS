@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateToken } from "../middlewares/authenticateToken.js";
-import { noCache } from "../middlewares/noCache";
+import { noCache } from "../middlewares/noCache.js";
 import * as adminController from "../controllers/adminController.js";
 
 const router = Router();
