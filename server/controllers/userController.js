@@ -1,20 +1,20 @@
-const { usersCollection } = require("../config/db");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { getUsersCollection } from "../config/db";
 
-exports.loginPage = (req, res) => {
+const loginPage = (req, res) => {
   res.status(200).render("user/userSignIn");
 };
 
-exports.signupPage = (req, res) => {
+const signupPage = (req, res) => {
   res.status(200).render("user/userSignup");
 };
 
-exports.about = (req, res) => {
+const about = (req, res) => {
   res.status(200).render("user/about");
 };
 
-exports.homePage = (req, res) => {
+const homePage = (req, res) => {
   const user = req.user;
   res.status(200).render("user/home", {
     firstName: user.firstName,
@@ -22,10 +22,10 @@ exports.homePage = (req, res) => {
   });
 };
 
-exports.userLogin = async (req, res) => {
+const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await usersCollection.findOne({ email: email });
+    const user = await getUsersCollection.findOne({ email: email });
     if (!user) {
       return res.status(400).send("User Not Found!");
     }
@@ -47,7 +47,7 @@ exports.userLogin = async (req, res) => {
   }
 };
 
-exports.userSignup = async (req, res) => {
+const userSignup = async (req, res) => {
   const { firstName, lastName, tel, email, password, passwordConfirm } =
     req.body;
 
@@ -58,7 +58,7 @@ exports.userSignup = async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await usersCollection.insertOne({
+    const user = await getUsersCollection.insertOne({
       firstName,
       lastName,
       tel,
@@ -73,7 +73,7 @@ exports.userSignup = async (req, res) => {
   }
 };
 
-exports.userLogout = async (req, res) => {
+const userLogout = async (req, res) => {
   // Clear JWT token cookie
   res.clearCookie("accessToken").redirect("/api/user/");
 };
@@ -81,3 +81,13 @@ exports.userLogout = async (req, res) => {
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
 }
+
+export {
+  loginPage,
+  signupPage,
+  about,
+  homePage,
+  userLogin,
+  userSignup,
+  userLogout,
+};
