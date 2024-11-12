@@ -6,4 +6,4 @@ const noCache = (req, res, next) => {
   next();
 };
 
-module.exports = noCache;
+export { noCache };
