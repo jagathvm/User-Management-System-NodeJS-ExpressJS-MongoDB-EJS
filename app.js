@@ -1,10 +1,12 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const expressLayout = require("express-ejs-layouts");
-const path = require("path");
-const { connectToDB } = require("./server/config/db");
-const userRoutes = require("./server/routes/userRoutes");
-const adminRoutes = require("./server/routes/adminRoutes");
+import express from "express";
+import cookieParser from "cookie-parser";
+import expressEjsLayouts from "express-ejs-layouts";
+import path from "path";
+import { connectToDB } from "./server/config/db.js";
+
+// Routes
+import userRoutes from "./server/routes/userRoutes.js";
+import adminRoutes from "./server/routes/adminRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -16,7 +18,7 @@ connectToDB();
 app.set("view engine", "ejs");
 
 // Express Layout
-app.use(expressLayout);
+app.use(expressEjsLayouts);
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/admin/dashboard")) {
     app.set("layout", "./layouts/main");
@@ -41,3 +43,5 @@ app.use("/", adminRoutes);
 app.listen(PORT, () => {
   console.log(`Server running at Port ${PORT}`);
 });
+
+export default app;
