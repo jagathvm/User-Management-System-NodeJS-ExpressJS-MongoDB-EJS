@@ -1,52 +1,6 @@
 import { ObjectId } from "mongodb";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { getAdminCollection, getUsersCollection } from "../config/db.js";
-
-/*
- * GET /api/admin/
- * Sign In
- */
-
-const adminSignInPage = async (req, res) => {
-  try {
-    res.status(200).render("admin/adminSignIn");
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-/*
- * POST /api/admin/
- * Sign In
- */
-
-const adminSignIn = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const admin = await getAdminCollection.findOne({
-      email,
-    });
-
-    if (!admin) return res.status(400).send("Invalid username or password");
-
-    if (await bcrypt.compare(password, admin.password)) {
-      // Generate JWT Token
-      const accessToken = generateAccessToken(admin);
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
-
-      res.status(200).redirect("/api/admin/dashboard");
-    } else {
-      return res.status(404).send("Invalid username or password");
-    }
-  } catch (error) {
-    console.log(`Error in /admin/ route: ${error}`);
-    res.status(500).send("Internal Server Error");
-  }
-};
+import { getUsersCollection } from "../config/db.js";
 
 /*
  * GET /api/admin/dashboard
