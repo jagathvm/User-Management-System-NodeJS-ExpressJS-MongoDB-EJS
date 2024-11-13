@@ -5,9 +5,6 @@ import * as adminController from "../controllers/adminController.js";
 
 const router = Router();
 
-router.get("/", adminController.adminSignInPage);
-router.post("/", adminController.adminSignIn);
-
 router.use(noCache, authenticateToken);
 
 router.get("/dashboard", adminController.dashboard);

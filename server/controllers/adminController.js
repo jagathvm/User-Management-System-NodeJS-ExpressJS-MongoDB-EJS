@@ -240,8 +240,6 @@ function generateAccessToken(admin) {
 }
 
 export {
-  adminSignIn,
-  adminSignInPage,
   dashboard,
   about,
   addUser,
