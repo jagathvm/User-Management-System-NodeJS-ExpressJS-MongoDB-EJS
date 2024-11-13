@@ -1,6 +1,13 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { getUsersCollection } from "../config/db.js";
+import {
+  createUser,
+  findUserByCredentials,
+  findUserByEmail,
+} from "../services/userServices.js";
+import {
+  comparePasswords,
+  clearCookies,
+  setCookies,
+} from "../helpers/authHelpers.js";
 
 const loginPage = (req, res) => {
   res.status(200).render("user/userSignIn");
@@ -15,56 +22,50 @@ const about = (req, res) => {
 };
 
 const homePage = (req, res) => {
-  const user = req.user;
+  const { username } = req.user;
   res.status(200).render("user/home", {
-    firstName: user.firstName,
-    lastName: user.lastName,
+    username,
   });
 };
 
 const userLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await getUsersCollection.findOne({ email: email });
-    if (!user) {
-      return res.status(400).send("User Not Found!");
-    }
-    if (await bcrypt.compare(password, user.password)) {
-      // Generate JWT Token
-      const accessToken = generateAccessToken(user);
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
+  const { email, password } = req.body;
 
-      res.status(200).redirect("/api/user/home");
-    } else {
-      return res.status(404).send("Wrong Password");
-    }
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) return res.status(400).send("Invalid email or password.");
+
+    const passwordsMatch = await comparePasswords(password, user.password);
+    if (!passwordsMatch)
+      return res.status(400).send("Invalid email or password.");
+
+    await setCookies(res, user);
+
+    res.status(200).redirect("/api/user/home");
   } catch (error) {
     console.log(`Error in /login route: ${error}`);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send("Something went wrong. Please login after sometime");
   }
 };
 
 const userSignup = async (req, res) => {
-  const { firstName, lastName, tel, email, password, passwordConfirm } =
-    req.body;
+  const { username, tel, email, password, passwordConfirm } = req.body;
 
   try {
+    const userExists = await findUserByCredentials(username, email, tel);
+    if (userExists) return res.status(400).send("User already exists.");
+
     if (password !== passwordConfirm)
       return res.status(401).send("Passwords Do not match");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await getUsersCollection.insertOne({
-      firstName,
-      lastName,
-      tel,
-      email,
-      password: hashedPassword,
-    });
+    const user = await createUser(res, { username, tel, email, password });
+    console.log(user);
+    if (!user)
+      return res
+        .status(500)
+        .send("Something went wrong. Please signup after sometime");
 
-    res.status(201).redirect("/api/user/");
+    res.status(201).redirect("/api/user/home");
   } catch (error) {
     console.error(`Error in /submit route: ${error}`);
     res.status(500).send(`Internal Server Error`);
@@ -72,13 +73,19 @@ const userSignup = async (req, res) => {
 };
 
 const userLogout = async (req, res) => {
-  // Clear JWT token cookie
-  res.clearCookie("accessToken").redirect("/api/user/");
-};
+  try {
+    // Clear JWT token cookie
+    await clearCookies(res);
 
-function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-}
+    // Redirect to login page
+    res.redirect("/api/user/");
+  } catch (error) {
+    console.error(`Error in /logout route: ${error}`);
+    res
+      .status(500)
+      .send("Something went wrong. Please logout after some time.");
+  }
+};
 
 export {
   loginPage,

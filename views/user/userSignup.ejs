@@ -1,59 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SignUp</title>
     <link rel="stylesheet" href="/stylesheets/styles.css">
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="wrapper sign-up">
-        <!-- Sign Up -->
-        <div class="form-wrapper sign-up">
-            <form id="formSignUp" action="" method="post">
-                <h2>Sign Up</h2>
-                <div class="input-group">
-                    <input autocomplete="off" type="text" name="firstName" required>
-                    <label for="firstName">First Name</label>
-                </div>
-                <div class="input-group">
-                    <input autocomplete="off" type="text" name="lastName" required>
-                    <label for="lastName">Last Name</label>
-                </div>
-                <div class="input-group">
-                    <input autocomplete="off" type="tel" name="tel" required>
-                    <label for="tel">Telephone</label>
-                </div>
-                <div class="input-group">
-                    <input autocomplete="off" type="email" name="email" required>
-                    <label for="email">Email</label>
-                </div>
-                <div class="input-group">
-                    <input autocomplete="off" type="password" name="password" required>
-                    <label for="password">Password</label>
-                </div>
-                <div class="input-group">
-                    <input autocomplete="off" type="password" name="passwordConfirm" required>
-                    <label for="passwordConfirm">Confirm Your Password</label>
-                </div>
-                <div class="remember">
-                    <label for="checkbox_id2">
-                        <input type="checkbox" name="checkbox" id="checkbox_id2" value="value" required>
-                        By signing up, you agree to our Terms and Privacy Policy.
-                    </label>
-                </div>
-                <button type="submit" id="signUp">Signup</button>
-                <div class="signIn-Link">
-                    <p>Already have an account? <a href="/api/user/" class="signInBtn-Link">Sign In</a></p>
-                </div>
-                <p id="demo"></p>
-            </form>
-        </div>
+      <!-- Sign Up -->
+      <div class="form-wrapper sign-up">
+        <form id="formSignUp" action="" method="post">
+          <h2>Sign Up</h2>
+          <div class="input-group">
+            <input autocomplete="off" type="text" name="username" required>
+            <label for="username">Username</label>
+          </div>
+          <div class="input-group">
+            <input autocomplete="off" type="tel" name="tel" required>
+            <label for="tel">Telephone</label>
+          </div>
+          <div class="input-group">
+            <input autocomplete="off" type="email" name="email" required>
+            <label for="email">Email</label>
+          </div>
+          <div class="input-group">
+            <input autocomplete="off" type="password" name="password" required>
+            <label for="password">Password</label>
+          </div>
+          <div class="input-group">
+            <input autocomplete="off" type="password" name="passwordConfirm" required>
+            <label for="passwordConfirm">Confirm Your Password</label>
+          </div>
+          <div class="remember">
+            <label for="checkbox_id2">
+              <input type="checkbox" name="checkbox" id="checkbox_id2" value="value" required>
+              By signing up, you agree to our Terms and Privacy Policy.
+            </label>
+          </div>
+          <button type="submit" id="signUp">Signup</button>
+          <div class="signIn-Link">
+            <p>Already have an account? <a href="/api/user/" class="signInBtn-Link">Sign In</a></p>
+          </div>
+          <p id="demo"></p>
+        </form>
+      </div>
     </div>
 
     <script src="/scripts/user/userSignUp.js"></script>
-</body>
+  </body>
 
 </html>

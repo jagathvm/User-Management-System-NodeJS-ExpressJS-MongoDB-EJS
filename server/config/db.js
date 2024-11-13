@@ -24,7 +24,6 @@ const getCollection = async (collectionName) => {
   return db.collection(collectionName);
 };
 
-const getAdminCollection = await getCollection("admin");
 const getUsersCollection = await getCollection("users");
 
-export { connectToDB, getAdminCollection, getUsersCollection };
+export { connectToDB, getUsersCollection };
