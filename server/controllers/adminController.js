@@ -1,6 +1,10 @@
-import { ObjectId } from "mongodb";
 import jwt from "jsonwebtoken";
 import { getUsersCollection } from "../config/db.js";
+import { clearCookies } from "../helpers/authHelpers.js";
+
+const locals = {
+  description: "Nodejs USER Management System",
+};
 
 /*
  * GET /api/admin/dashboard
@@ -8,11 +12,7 @@ import { getUsersCollection } from "../config/db.js";
  */
 
 const dashboard = async (req, res) => {
-  const locals = {
-    title: "Admin Dashboard - Node.js",
-    description: "Nodejs USER Management System",
-  };
-
+  locals.title = "Admin Dashboard - Node.js";
   let perPage = 12;
   let page = req.query.page || 1;
 
@@ -43,10 +43,7 @@ const dashboard = async (req, res) => {
  */
 
 const about = async (req, res) => {
-  const locals = {
-    title: "About - Node.js",
-    description: "Nodejs USER Management System",
-  };
+  locals.title = "About - Node.js";
 
   try {
     res.status(200).render("admin/about", locals);
@@ -61,10 +58,7 @@ const about = async (req, res) => {
  */
 
 const addUser = async (req, res) => {
-  const locals = {
-    title: "Add New User - Node.js",
-    description: "Nodejs USER Management System",
-  };
+  locals.title = "Add New User - Node.js";
   res.status(200).render("admin/addUser", { locals });
 };
 
@@ -74,21 +68,30 @@ const addUser = async (req, res) => {
  */
 
 const postUser = async (req, res) => {
+  const { username, email, tel, role } = req.body;
+
   try {
-    const { firstName, lastName, email, tel } = req.body;
-
-    const result = await getUsersCollection.insertOne({
-      firstName,
-      lastName,
+    const userData = {
+      username,
       email,
-      tel,
-    });
+      tel: Number(tel),
+      role: {
+        id: role === "ADMIN" ? 1 : 2,
+        name: role,
+      },
+    };
+    const result = await getUsersCollection.insertOne(userData);
 
-    if (result) {
-      res.status(200).redirect("/api/admin/dashboard");
-    } else {
-      res.status(500).json({ message: "Error Adding User" });
-    }
+    if (!result)
+      return res
+        .status(500)
+        .json({ success: false, message: "Error Adding User" });
+
+    return res.status(200).json({
+      success: false,
+      message: "User Added Successfully",
+      data: username,
+    });
   } catch (error) {
     console.error(error);
   }
@@ -100,16 +103,14 @@ const postUser = async (req, res) => {
  */
 
 const viewUser = async (req, res) => {
-  const locals = {
-    title: "View User - Node.js",
-    description: "Nodejs USER Management System",
-  };
+  const { username } = req.params;
+  locals.title = "View User - Node.js";
 
   try {
-    const user = await getUsersCollection.findOne({
-      _id: new ObjectId(req.params.id),
-    });
-    res.status(200).render("admin/viewUser", { locals, user });
+    const user = await getUsersCollection.findOne({ username });
+
+    if (!user) return res.status(404).render("admin/404");
+    return res.status(200).render("admin/viewUser", { locals, user });
   } catch (error) {
     console.error(error);
   }
@@ -121,21 +122,15 @@ const viewUser = async (req, res) => {
  */
 
 const editUser = async (req, res) => {
-  const userId = req.params.id;
-  const locals = {
-    title: "Edit User - Node.js",
-    description: "Nodejs USER Management System",
-  };
+  const { username } = req.params;
+  locals.title = "Edit User - Node.js";
 
   try {
-    const user = await getUsersCollection.findOne({
-      _id: new ObjectId(userId),
-    });
+    const user = await getUsersCollection.findOne({ username });
 
     res.status(200).render("admin/editUser", { locals, user });
   } catch (error) {
     console.error(error);
-    res.status(500).redirect("/api/admin/dashboard");
   }
 };
 
@@ -145,25 +140,37 @@ const editUser = async (req, res) => {
  */
 
 const updateUser = async (req, res) => {
-  const userId = req.params.id;
+  const { username } = req.params;
+  const { email, tel, role } = req.body;
 
   try {
     const updateData = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      tel: req.body.tel,
+      username: req.body.username,
+      email,
+      tel: Number(tel),
+      role: {
+        id: role === "ADMIN" ? 1 : 2,
+        name: role,
+      },
     };
 
-    await getUsersCollection.findOneAndUpdate(
-      { _id: new ObjectId(userId) },
+    const { modifiedCount } = await getUsersCollection.updateOne(
+      { username },
       { $set: updateData }
     );
+
+    if (!modifiedCount)
+      return res
+        .status(500)
+        .json({ success: false, message: "Error updating user" });
+
+    return res.status(200).json({
+      success: true,
+      message: "User Updated",
+      data: req.body.username,
+    });
   } catch (error) {
     console.error(`Error Updating User: ${error}`);
-    res.status(500).redirect(`/api/admin/dashboard/edit/${userId}`);
-  } finally {
-    res.json({ message: "User Details Updated." });
   }
 };
 
@@ -173,18 +180,21 @@ const updateUser = async (req, res) => {
  */
 
 const deleteUser = async (req, res) => {
-  const userId = req.params.id;
+  const { username } = req.params;
 
   try {
-    const result = await getUsersCollection.deleteOne({
-      _id: new ObjectId(userId),
-    });
+    const { deletedCount } = await getUsersCollection.deleteOne({ username });
 
-    res.status(200).redirect("/api/admin/dashboard");
-    // res.status(200).json({ message: "User deleted successfully" });
+    if (!deletedCount)
+      return res
+        .status(500)
+        .json({ success: false, message: "Error Deleting User" });
+
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     console.error(`Error Deleting User: ${error}`);
-    res.status(500).redirect("/api/admin/dashboard");
   }
 };
 
@@ -194,32 +204,22 @@ const deleteUser = async (req, res) => {
  */
 
 const searchUser = async (req, res) => {
-  const locals = {
-    title: "Search User - Node.js",
-    description: "Nodejs USER Management System",
-  };
+  const { searchTerm } = req.body;
+  locals.title = "Search User - Node.js";
+
   try {
-    const searchTerm = req.body.searchTerm;
     const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9]/g, "");
+    const searchCriteria = new RegExp(searchNoSpecialChar, "i");
 
     const users = await getUsersCollection
       .find({
         $or: [
-          { firstName: { $regex: new RegExp(searchNoSpecialChar, "i") } },
-          { lastName: { $regex: new RegExp(searchNoSpecialChar, "i") } },
-          {
-            tel: {
-              $regex: new RegExp(
-                `^[\\d\\s\\-()\\+]*${searchNoSpecialChar}[\\d\\s\\-()\\+]*$`,
-                "i"
-              ),
-            },
-          },
+          { username: searchCriteria },
+          { email: searchCriteria },
+          { tel: searchCriteria },
         ],
       })
       .toArray();
-
-    // console.log(users);
 
     res.render("admin/searchUser", { locals, users });
   } catch (error) {
@@ -229,8 +229,18 @@ const searchUser = async (req, res) => {
 };
 
 const adminLogout = async (req, res) => {
-  // Clear JWT token cookie
-  res.clearCookie("accessToken").redirect("/api/admin/");
+  try {
+    // Clear JWT token cookie
+    await clearCookies(res);
+
+    // Redirect to login page
+    res.redirect("/api/user/");
+  } catch (error) {
+    console.error(`Error in /logout route: ${error}`);
+    res
+      .status(500)
+      .send("Something went wrong. Please logout after some time.");
+  }
 };
 
 function generateAccessToken(admin) {

@@ -12,10 +12,9 @@ formSignUp.addEventListener("submit", async (e) => {
       body: JSON.stringify(data),
     });
 
-    const jsonResponse = await result.json();
-    console.log(jsonResponse);
+    const response = await result.json();
 
-    if (jsonResponse.ok) {
+    if (response.ok) {
       console.log("Signup successful");
     } else {
       console.error("Signup Failed");

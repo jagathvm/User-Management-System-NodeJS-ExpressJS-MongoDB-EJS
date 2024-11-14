@@ -41,7 +41,8 @@ const userLogin = async (req, res) => {
 
     await setCookies(res, user);
 
-    res.status(200).redirect("/api/user/home");
+    if (user.role.id === 1) return res.redirect("/api/admin/dashboard");
+    return res.status(200).redirect("/api/user/home");
   } catch (error) {
     console.log(`Error in /login route: ${error}`);
     res.status(500).send("Something went wrong. Please login after sometime");

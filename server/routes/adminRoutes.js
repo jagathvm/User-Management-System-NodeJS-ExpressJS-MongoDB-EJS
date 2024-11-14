@@ -12,13 +12,12 @@ router.get("/dashboard/about", adminController.about);
 router.get("/dashboard/logout", adminController.adminLogout);
 
 router.get("/dashboard/addUser", adminController.addUser);
+router.get("/dashboard/view/:username", adminController.viewUser);
+
 router.post("/dashboard/postUser", adminController.postUser);
 router.post("/dashboard/searchUser", adminController.searchUser);
 
-router.get("/dashboard/view/:id", adminController.viewUser);
-router.get("/dashboard/edit/:id", adminController.editUser);
-
-router.put("/dashboard/edit/:id", adminController.updateUser);
-router.delete("/dashboard/edit/:id", adminController.deleteUser);
+router.put("/dashboard/view/update/:username", adminController.updateUser);
+router.delete("/dashboard/view/delete/:username", adminController.deleteUser);
 
 export default router;

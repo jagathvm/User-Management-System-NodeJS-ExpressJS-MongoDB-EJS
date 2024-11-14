@@ -1,56 +1,43 @@
 <div class="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h1">Users</h1>
-    <!-- <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-            <button class="btn btn-sm btn-outline-secondary">gyuhuhu</button>
-        </div>
-    </div> -->
+  <h1 class="h1">Users</h1>
 </div>
 
 <div class="col py-3">
-    <div class="row">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/api/admin/dashboard">Dashboard</a></li>
-                    <li class="breadcrumb-item active">New User</li>
-                </ol>
-            </nav>
-        </div>
-        <div class="col text-end fw-lighter">
-            <b>UserId</b>
-        </div>
+  <div class="row">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/api/admin/dashboard">Dashboard</a></li>
+          <li class="breadcrumb-item active">New User</li>
+        </ol>
+      </nav>
     </div>
+    <div class="col text-end fw-lighter">
+      <b>UserId</b>
+    </div>
+  </div>
 </div>
 
 <div class="container mt-2">
-    <h2>Add User</h2>
-    <form id="addUserForm">
-        <div class="form-group mt-3">
-            <label for="firstName">First Name</label>
-            <input type="text" class="form-control mt-1" id="firstName" name="firstName" placeholder="Enter First Name"
-                autocomplete="on" required>
-        </div>
-        <div class="form-group mt-3">
-            <label for="lastName">Last Name</label>
-            <input type="text" class="form-control mt-1" id="lastName" name="lastName" placeholder="Enter Last Name"
-                autocomplete="on" required>
-        </div>
-        <div class=" form-group mt-3">
-            <label for="email">Email</label>
-            <input type="email" class="form-control mt-1" id="email" name="email" placeholder="Enter email"
-                autocomplete="on" required>
-        </div>
-        <div class="form-group mt-3">
-            <label for="tel">Telephone</label>
-            <input type="tel" class="form-control mt-1" id="tel" name="tel" placeholder="Enter Phone Number"
-                autocomplete="on" required>
-        </div>
+  <h2>Add User</h2>
+  <form id="addUserForm">
+    <div class="form-group mt-3">
+      <label for="username">Username</label>
+      <input type="text" class="form-control mt-1" id="username" name="username" placeholder="Enter Last Name" autocomplete="on" required>
+    </div>
+    <div class=" form-group mt-3">
+      <label for="email">Email</label>
+      <input type="email" class="form-control mt-1" id="email" name="email" placeholder="Enter email" autocomplete="on" required>
+    </div>
+    <div class="form-group mt-3">
+      <label for="tel">Telephone</label>
+      <input type="tel" class="form-control mt-1" id="tel" name="tel" placeholder="Enter Phone Number" autocomplete="on" required>
+    </div>
 
-        <div class="form-group mt-1">
-            <button type="submit" class="btn btn-primary mt-3">Add User</button>
-        </div>
-    </form>
+    <div class="form-group mt-1">
+      <button type="submit" class="btn btn-primary mt-3">Add User</button>
+    </div>
+  </form>
 </div>
 
 <script async src="/scripts/user/postUser.js"></script>

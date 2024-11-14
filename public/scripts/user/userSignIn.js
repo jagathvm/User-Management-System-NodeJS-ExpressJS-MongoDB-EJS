@@ -12,9 +12,9 @@ formSignIn.addEventListener("submit", async (e) => {
       body: JSON.stringify(data),
     });
 
-    const jsonResponse = await result.json();
+    const response = await result.json();
 
-    if (jsonResponse.ok) {
+    if (response.ok) {
       console.log("User Signed In");
     } else {
       console.error("Failed to Sign In");

@@ -2,7 +2,6 @@ const addUserForm = document.getElementById("addUserForm");
 
 // Fetch data from addUser Form
 addUserForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
   const formData = new FormData(addUserForm);
   const data = Object.fromEntries(formData);
 
@@ -15,9 +14,13 @@ addUserForm.addEventListener("submit", async (e) => {
       body: JSON.stringify(data),
     });
 
-    if (result.ok) {
-      window.location.href = "/api/admin/dashboard";
+    const response = await result.json();
+
+    if (!response.success) {
+      alert(response.message);
     }
+
+    window.location.href = `/api/admin/dashboard/view/${response.data}`;
   } catch (error) {
     console.error(error);
   }
