@@ -71,6 +71,7 @@ A full-stack web application for managing users, built with **Node.js**, **Expre
 
 The project is structured as follows:
 
+```plaintext
 User-Management-System-NodeJS-ExpressJS-MongoDB-EJS
 ├───public/ # Static assets for client-side
 │ ├───scripts/ # JavaScript files for frontend functionality
@@ -90,3 +91,4 @@ User-Management-System-NodeJS-ExpressJS-MongoDB-EJS
 ├───layouts/ # Main layouts used by different pages
 ├───partials/ # Reusable partials (e.g., header, footer)
 └───user/ # Views specific to standard user pages
+```
