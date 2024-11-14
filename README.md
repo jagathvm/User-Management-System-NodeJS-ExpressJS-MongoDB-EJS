@@ -73,22 +73,22 @@ The project is structured as follows:
 
 ```plaintext
 User-Management-System-NodeJS-ExpressJS-MongoDB-EJS
-├───public/ # Static assets for client-side
-│ ├───scripts/ # JavaScript files for frontend functionality
-│ │ └───user/ # Scripts specific to user management
-│ └───stylesheets/ # CSS files for styling
+├───public/               # Static assets for client-side
+│ ├───scripts/            # JavaScript files for frontend functionality
+│ │ └───user/             # Scripts specific to user management
+│ └───stylesheets/        # CSS files for styling
 │
-├───server/ # Server-side application code
-│ ├───config/ # Configuration files (database, environment, etc.)
-│ ├───controllers/ # Controllers to handle business logic for routes
-│ ├───helpers/ # Utility functions for various functionalities
-│ ├───middlewares/ # Middleware functions (e.g., authentication, error handling)
-│ ├───routes/ # Route definitions for API endpoints
-│ └───services/ # Service layer for handling external API calls, etc.
+├───server/               # Server-side application code
+│ ├───config/             # Configuration files (database, environment, etc.)
+│ ├───controllers/        # Controllers to handle business logic for routes
+│ ├───helpers/            # Utility functions for various functionalities
+│ ├───middlewares/        # Middleware functions (e.g., authentication)
+│ ├───routes/             # Route definitions for API endpoints
+│ └───services/           # Service layer for handling external API calls, etc.
 │
-└───views/ # EJS templates for rendering HTML
-├───admin/ # Views specific to admin users
-├───layouts/ # Main layouts used by different pages
-├───partials/ # Reusable partials (e.g., header, footer)
-└───user/ # Views specific to standard user pages
+└───views/                # EJS templates for rendering HTML
+├───admin/                # Views specific to admin users
+├───layouts/              # Main layouts used by different pages
+├───partials/             # Reusable partials (e.g., header, footer)
+└───user/                 # Views specific to standard user pages
 ```
