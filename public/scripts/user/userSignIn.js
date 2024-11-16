@@ -1,25 +1,22 @@
+import { apiClient } from "../apiServices/httpRequest.js";
 const formSignIn = document.getElementById("formSignIn");
 
 formSignIn.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
   const formData = new FormData(formSignIn);
   const data = Object.fromEntries(formData);
 
   try {
-    const result = await fetch("/api/user/", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const result = await apiClient.httpRequest("/user/", "POST", data);
+    const redirectUrl =
+      result.data === 1 ? "/api/admin/dashboard" : "/api/user/home";
 
-    const response = await result.json();
-
-    if (response.ok) {
-      console.log("User Signed In");
-    } else {
-      console.error("Failed to Sign In");
-    }
+    alert(result.message);
+    window.location.href = redirectUrl;
   } catch (error) {
-    console.log(error);
+    console.log("Sign-in error: ", error);
+    alert("An error occurred during sign-in. Please try again later.");
+    throw error;
   }
 });
