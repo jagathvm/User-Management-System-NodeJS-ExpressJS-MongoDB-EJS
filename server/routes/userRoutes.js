@@ -5,16 +5,62 @@ import * as userController from "../controllers/userController.js";
 
 const router = Router();
 
+// Apply noCache middleware to all routes
 router.use(noCache);
-router.get("/", userController.loginPage);
-router.get("/signup", userController.signupPage);
-router.get("/logout", userController.userLogout);
 
-router.post("/", userController.userLogin);
-router.post("/signup", userController.userSignup);
+// ====== Public Routes ====== //
+/**
+ * @route   GET /
+ * @desc    Render the login page
+ * @access  Public
+ */
+router.get("/", userController.renderLoginPage);
 
+/**
+ * @route   GET /signup
+ * @desc    Render the signup page
+ * @access  Public
+ */
+router.get("/signup", userController.renderSignupPage);
+
+/**
+ * @route   GET /logout
+ * @desc    Log out the user and clear cookies
+ * @access  Public
+ */
+router.get("/logout", userController.handleUserLogout);
+
+/**
+ * @route   POST /
+ * @desc    Handle user login
+ * @access  Public
+ */
+router.post("/", userController.handleUserLogin);
+
+/**
+ * @route   POST /signup
+ * @desc    Handle user registration
+ * @access  Public
+ */
+router.post("/signup", userController.handleUserSignup);
+
+// ====== Protected Routes ====== //
+
+// Apply authentication middleware to all protected routes
 router.use(authenticateToken);
-router.get("/home", userController.homePage);
-router.get("/about", userController.about);
+
+/**
+ * @route   GET /home
+ * @desc    Render the home page
+ * @access  Protected
+ */
+router.get("/home", userController.renderHomePage);
+
+/**
+ * @route   GET /about
+ * @desc    Render the about page
+ * @access  Protected
+ */
+router.get("/about", userController.renderAboutPage);
 
 export default router;
