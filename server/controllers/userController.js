@@ -9,58 +9,75 @@ import {
   setCookies,
 } from "../helpers/authHelpers.js";
 
-const loginPage = (req, res) => {
+// ===== Render Pages ===== //
+export const renderLoginPage = (req, res) => {
   res.status(200).render("user/userSignIn");
 };
 
-const signupPage = (req, res) => {
+export const renderSignupPage = (req, res) => {
   res.status(200).render("user/userSignup");
 };
 
-const about = (req, res) => {
+export const renderAboutPage = (req, res) => {
   res.status(200).render("user/about");
 };
 
-const homePage = (req, res) => {
+export const renderHomePage = (req, res) => {
+  // Extract from token middleware
   const { username } = req.user;
+
   res.status(200).render("user/home", {
     username,
   });
 };
 
-const userLogin = async (req, res) => {
+// ===== Authentication Handlers ===== //
+export const handleUserLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await findUserByEmail(email);
-    if (!user) return res.status(400).send("Invalid email or password.");
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email or password." });
 
     const passwordsMatch = await comparePasswords(password, user.password);
     if (!passwordsMatch)
-      return res.status(400).send("Invalid email or password.");
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid email or password." });
 
+    // Set JWT cookies
     await setCookies(res, user);
 
-    if (user.role.id === 1) return res.redirect("/api/admin/dashboard");
-    return res.status(200).redirect("/api/user/home");
+    // Redirect based on role
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful.",
+        data: user.role.id,
+      });
   } catch (error) {
     console.log(`Error in /login route: ${error}`);
     res.status(500).send("Something went wrong. Please login after sometime");
   }
 };
 
-const userSignup = async (req, res) => {
+export const handleUserSignup = async (req, res) => {
   const { username, tel, email, password, passwordConfirm } = req.body;
 
   try {
-    const userExists = await findUserByCredentials(username, email, tel);
-    if (userExists) return res.status(400).send("User already exists.");
-
     if (password !== passwordConfirm)
       return res.status(401).send("Passwords Do not match");
 
+    // Check if user already exists
+    const userExists = await findUserByCredentials(username, email, tel);
+    if (userExists) return res.status(400).send("User already exists.");
+
+    // Create user
     const user = await createUser(res, { username, tel, email, password });
-    console.log(user);
     if (!user)
       return res
         .status(500)
@@ -73,9 +90,9 @@ const userSignup = async (req, res) => {
   }
 };
 
-const userLogout = async (req, res) => {
+export const handleUserLogout = async (req, res) => {
   try {
-    // Clear JWT token cookie
+    // Clear token cookies
     await clearCookies(res);
 
     // Redirect to login page
@@ -86,14 +103,4 @@ const userLogout = async (req, res) => {
       .status(500)
       .send("Something went wrong. Please logout after some time.");
   }
-};
-
-export {
-  loginPage,
-  signupPage,
-  about,
-  homePage,
-  userLogin,
-  userSignup,
-  userLogout,
 };
