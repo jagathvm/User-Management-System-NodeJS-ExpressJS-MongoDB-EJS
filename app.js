@@ -10,6 +10,7 @@ import { connectToDB } from "./server/config/db.js";
 // Routes
 import userRoutes from "./server/routes/userRoutes.js";
 import adminRoutes from "./server/routes/adminRoutes.js";
+import { setLayout } from "./server/middlewares/setLayout.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -25,14 +26,7 @@ app.set("view engine", "ejs");
 
 // Express Layout
 app.use(expressEjsLayouts);
-app.use((req, res, next) => {
-  if (req.path.startsWith("/api/admin/dashboard")) {
-    app.set("layout", "./layouts/main");
-  } else {
-    app.set("layout", false);
-  }
-  next();
-});
+app.use(setLayout);
 
 // Static Files
 app.use(express.static(path.join(__dirname, "public")));
