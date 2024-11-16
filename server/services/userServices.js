@@ -35,6 +35,25 @@ const findUserByCredentials = async (username, email, tel) => {
   }
 };
 
+const findUsersBySearchCriteria = async (searchCriteria) => {
+  try {
+    const users = await getUsersCollection
+      .find({
+        $or: [
+          { username: searchCriteria },
+          { email: searchCriteria },
+          { tel: searchCriteria },
+        ],
+      })
+      .toArray();
+
+    return users;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 const createUser = async (res, data) => {
   const { username, tel, email, password } = data;
 
@@ -68,4 +87,34 @@ const createUser = async (res, data) => {
   }
 };
 
-export { findUserByEmail, findUserByCredentials, createUser };
+const updateUserData = async (username, data) => {
+  try {
+    const result = await getUsersCollection.updateOne(
+      { username },
+      { $set: data }
+    );
+    return result;
+  } catch (error) {
+    console.error("Error in updating user:", error);
+    throw error;
+  }
+};
+
+const deleteUserData = async (username) => {
+  try {
+    const result = await getUsersCollection.deleteOne({ username });
+    return result;
+  } catch (error) {
+    console.error("Error in deleting user:", error);
+    throw error;
+  }
+};
+
+export {
+  findUserByEmail,
+  findUserByCredentials,
+  findUsersBySearchCriteria,
+  createUser,
+  updateUserData,
+  deleteUserData,
+};
