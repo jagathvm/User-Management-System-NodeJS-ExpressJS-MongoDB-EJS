@@ -10,6 +10,7 @@
         <th scope="col">Username</th>
         <th scope="col">Email</th>
         <th scope="col">Telephone</th>
+        <th scope="col">Role</th>
       </tr>
     </thead>
     <tbody>
@@ -23,6 +24,9 @@
         </td>
         <td>
           <%= user.tel %>
+        </td>
+        <td>
+          <%= user.role.name %>
         </td>
       </tr>
       <% }) %>
