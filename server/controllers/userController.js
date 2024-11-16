@@ -58,8 +58,11 @@ export const handleUserLogin = async (req, res) => {
       data: user.role.id,
     });
   } catch (error) {
-    console.log(`Error in /login route: ${error}`);
-    res.status(500).send("Something went wrong. Please login after sometime");
+    console.log(`Error in user login: ${error}`);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please login after sometime",
+    });
   }
 };
 
@@ -89,8 +92,11 @@ export const handleUserSignup = async (req, res) => {
 
     res.status(201).json({ success: true, message: "Signup successful." });
   } catch (error) {
-    console.error(`Error in /submit route: ${error}`);
-    res.status(500).send(`Internal Server Error`);
+    console.error(`Error in user sign-up: ${error}`);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please signup after sometime",
+    });
   }
 };
 
