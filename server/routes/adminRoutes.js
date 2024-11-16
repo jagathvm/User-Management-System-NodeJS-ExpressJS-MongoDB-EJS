@@ -8,47 +8,54 @@ const router = Router();
 // Middleware for no-cache and authentication
 router.use(noCache, authenticateToken);
 
-// Admin Dashboard Routes
+// ====== Admin Dashboard Routes ====== //
 
 /**
  * @route   GET /dashboard
- * @desc    Render admin dashboard
+ * @desc    Render the admin dashboard
+ * @access  Protected
  */
 router.get("/dashboard", adminController.renderDashboardPage);
 
 /**
  * @route   GET /dashboard/about
- * @desc    Render admin about page
+ * @desc    Render the admin about page
+ * @access  Protected
  */
 router.get("/dashboard/about", adminController.renderAboutPage);
 
 /**
  * @route   GET /dashboard/addUser
- * @desc    Render add user form
+ * @desc    Render the add user form
+ * @access  Protected
  */
 router.get("/dashboard/addUser", adminController.renderAddUserForm);
 
 /**
  * @route   GET /dashboard/view/:username
- * @desc    View user details
+ * @desc    View the details of a user
+ * @access  Protected
  */
 router.get("/dashboard/view/:username", adminController.renderUserDetails);
 
 /**
  * @route   POST /dashboard/postUser
- * @desc    Handle adding a new user
+ * @desc    Handle the addition of a new user
+ * @access  Protected
  */
 router.post("/dashboard/postUser", adminController.handleAddUser);
 
 /**
  * @route   POST /dashboard/searchUser
- * @desc    Handle user search
+ * @desc    Handle the search for a user
+ * @access  Protected
  */
 router.post("/dashboard/searchUser", adminController.handleSearchUser);
 
 /**
  * @route   PUT /dashboard/view/update/:username
- * @desc    Handle user update
+ * @desc    Handle the update of user details
+ * @access  Protected
  */
 router.put(
   "/dashboard/view/update/:username",
@@ -57,7 +64,8 @@ router.put(
 
 /**
  * @route   DELETE /dashboard/view/delete/:username
- * @desc    Handle user deletion
+ * @desc    Handle the deletion of a user
+ * @access  Protected
  */
 router.delete(
   "/dashboard/view/delete/:username",
