@@ -52,13 +52,11 @@ export const handleUserLogin = async (req, res) => {
     await setCookies(res, user);
 
     // Redirect based on role
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Login successful.",
-        data: user.role.id,
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Login successful.",
+      data: user.role.id,
+    });
   } catch (error) {
     console.log(`Error in /login route: ${error}`);
     res.status(500).send("Something went wrong. Please login after sometime");
@@ -70,20 +68,26 @@ export const handleUserSignup = async (req, res) => {
 
   try {
     if (password !== passwordConfirm)
-      return res.status(401).send("Passwords Do not match");
+      return res
+        .status(401)
+        .json({ success: false, message: "Passwords Do not match" });
 
     // Check if user already exists
     const userExists = await findUserByCredentials(username, email, tel);
-    if (userExists) return res.status(400).send("User already exists.");
+    if (userExists)
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists." });
 
     // Create user
     const user = await createUser(res, { username, tel, email, password });
     if (!user)
-      return res
-        .status(500)
-        .send("Something went wrong. Please signup after sometime");
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please signup after sometime",
+      });
 
-    res.status(201).redirect("/api/user/home");
+    res.status(201).json({ success: true, message: "Signup successful." });
   } catch (error) {
     console.error(`Error in /submit route: ${error}`);
     res.status(500).send(`Internal Server Error`);
