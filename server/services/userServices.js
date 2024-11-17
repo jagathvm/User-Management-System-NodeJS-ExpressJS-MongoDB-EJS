@@ -55,7 +55,6 @@ export const findUsersBySearchCriteria = async (searchCriteria) => {
 };
 
 export const createUser = async (data) => {
-  console.log(data);
   const { username, tel, email, password } = data;
 
   try {
