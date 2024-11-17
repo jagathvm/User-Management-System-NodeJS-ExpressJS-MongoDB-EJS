@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 import { getUsersCollection } from "../config/db.js";
-import { hashedPassword, setCookies } from "../helpers/authHelpers.js";
+import { hashedPassword } from "../helpers/authHelpers.js";
 
-const findUserById = async (id) => {
+export const findUserById = async (id) => {
   try {
     const user = await getUsersCollection.findOne({ _id: new ObjectId(id) });
     return user;
@@ -12,7 +12,7 @@ const findUserById = async (id) => {
   }
 };
 
-const findUserByEmail = async (email) => {
+export const findUserByEmail = async (email) => {
   try {
     const user = await getUsersCollection.findOne({ email });
     return user;
@@ -22,7 +22,7 @@ const findUserByEmail = async (email) => {
   }
 };
 
-const findUserByCredentials = async (username, email, tel) => {
+export const findUserByCredentials = async (username, email, tel) => {
   try {
     const user = await getUsersCollection.findOne({
       $or: [{ username }, { email }, { tel }],
@@ -35,7 +35,7 @@ const findUserByCredentials = async (username, email, tel) => {
   }
 };
 
-const findUsersBySearchCriteria = async (searchCriteria) => {
+export const findUsersBySearchCriteria = async (searchCriteria) => {
   try {
     const users = await getUsersCollection
       .find({
@@ -54,7 +54,8 @@ const findUsersBySearchCriteria = async (searchCriteria) => {
   }
 };
 
-const createUser = async (data) => {
+export const createUser = async (data) => {
+  console.log(data);
   const { username, tel, email, password } = data;
 
   try {
@@ -70,22 +71,17 @@ const createUser = async (data) => {
       },
     };
 
-    const { acknowledged, insertedId } = await getUsersCollection.insertOne(
-      userData
-    );
-    if (!acknowledged) return null;
-
-    const user = await findUserById(insertedId);
-    if (!user) return null;
-
-    return user;
+    const result = await getUsersCollection.insertOne(userData);
+    console.log(result);
+    if (!result) return null;
+    return result;
   } catch (error) {
     console.error("Error in creating user:", error);
     throw error;
   }
 };
 
-const updateUserData = async (username, data) => {
+export const updateUserData = async (username, data) => {
   try {
     const result = await getUsersCollection.updateOne(
       { username },
@@ -98,7 +94,7 @@ const updateUserData = async (username, data) => {
   }
 };
 
-const deleteUserData = async (username) => {
+export const deleteUserData = async (username) => {
   try {
     const result = await getUsersCollection.deleteOne({ username });
     return result;
@@ -106,13 +102,4 @@ const deleteUserData = async (username) => {
     console.error("Error in deleting user:", error);
     throw error;
   }
-};
-
-export {
-  findUserByEmail,
-  findUserByCredentials,
-  findUsersBySearchCriteria,
-  createUser,
-  updateUserData,
-  deleteUserData,
 };
