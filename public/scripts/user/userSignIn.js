@@ -7,9 +7,10 @@ formSignIn.addEventListener("submit", async (e) => {
   // Extract data from the form
   const formData = new FormData(formSignIn);
   const data = Object.fromEntries(formData);
+  console.log(data);
 
   // Client-side validation
-  if (!data.username || !data.password) {
+  if (!data.email || !data.password) {
     alert("Username and password are required.");
     return;
   }

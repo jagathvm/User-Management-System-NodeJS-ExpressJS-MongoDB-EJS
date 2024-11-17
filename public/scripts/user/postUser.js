@@ -1,3 +1,5 @@
+import { apiClient } from "../apiServices/httpRequest.js";
+
 const addUserForm = document.getElementById("addUserForm");
 
 // Fetch data from addUser Form
@@ -6,21 +8,17 @@ addUserForm.addEventListener("submit", async (e) => {
   const data = Object.fromEntries(formData);
 
   try {
-    const result = await fetch("/api/admin/dashboard/postUser", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const result = await apiClient.httpRequest(
+      "/admin/dashboard/postUser",
+      "POST",
+      data
+    );
 
-    const response = await result.json();
-
-    if (!response.success) {
-      alert(response.message);
+    if (!result.success) {
+      alert(result.message);
     }
-
-    window.location.href = `/api/admin/dashboard/view/${response.data}`;
+    alert(result.message);
+    window.location.href = `/api/admin/dashboard/view/${result.data}`;
   } catch (error) {
     console.error(error);
   }
