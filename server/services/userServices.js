@@ -61,7 +61,7 @@ export const createUser = async (data) => {
     const passwordHash = await hashedPassword(password);
     const userData = {
       username,
-      tel,
+      tel: Number(tel),
       email,
       password: passwordHash,
       role: data.role || {
