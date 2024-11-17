@@ -90,6 +90,8 @@ export const handleUserSignup = async (req, res) => {
         message: "Something went wrong. Please signup after sometime",
       });
 
+    await setCookies(res, user);
+
     res.status(201).json({ success: true, message: "Signup successful." });
   } catch (error) {
     console.error(`Error in user sign-up: ${error}`);
@@ -109,8 +111,6 @@ export const handleUserLogout = async (req, res) => {
     res.redirect("/api/user/");
   } catch (error) {
     console.error(`Error in /logout route: ${error}`);
-    res
-      .status(500)
-      .send("Something went wrong. Please logout after some time.");
+    throw error;
   }
 };
