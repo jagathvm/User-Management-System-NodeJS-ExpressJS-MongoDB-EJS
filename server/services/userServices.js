@@ -64,6 +64,32 @@ export const findUsersBySearchCriteria = async (searchCriteria) => {
   }
 };
 
+export const findUsersByFilter = async (page, perPage) => {
+  try {
+    const users = await getUsersCollection
+      .find()
+      .sort({ firstName: 1 })
+      .skip(perPage * page - perPage)
+      .limit(perPage)
+      .toArray();
+
+    return users;
+  } catch (error) {
+    console.error(`Error in findUsersByFilter: ${error}`);
+    throw error;
+  }
+};
+
+export const findUsersCount = async () => {
+  try {
+    const usersCount = await getUsersCollection.countDocuments();
+    return usersCount;
+  } catch (error) {
+    console.error(`Error in findUsersCount: ${error}`);
+    throw error;
+  }
+};
+
 export const createUser = async (data) => {
   const { username, tel, email, password } = data;
 
