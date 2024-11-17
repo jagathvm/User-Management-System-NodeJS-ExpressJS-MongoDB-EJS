@@ -25,13 +25,6 @@ router.get("/dashboard", adminController.renderDashboardPage);
 router.get("/dashboard/about", adminController.renderAboutPage);
 
 /**
- * @route   GET /dashboard/addUser
- * @desc    Render the add user form
- * @access  Protected
- */
-router.get("/dashboard/addUser", adminController.renderAddUserForm);
-
-/**
  * @route   GET /dashboard/view/:username
  * @desc    View the details of a user
  * @access  Protected
