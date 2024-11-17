@@ -1,87 +1,109 @@
-import jwt from "jsonwebtoken";
 import { getUsersCollection } from "../config/db.js";
-import { clearCookies } from "../helpers/authHelpers.js";
+import {
+  createUser,
+  deleteUserData,
+  findUserByCredentials,
+  findUserByUsername,
+  findUsersByFilter,
+  findUsersBySearchCriteria,
+  findUsersCount,
+  updateUserData,
+} from "../services/userServices.js";
 
 const locals = {
   description: "Nodejs USER Management System",
 };
 
-/*
- * GET /api/admin/dashboard
- * dashboard
+/**
+ * Handle rendering the dashboard page.
+ * Displays a list of users with pagination.
+ * @route GET /api/admin/dashboard
  */
 
-const dashboard = async (req, res) => {
+export const renderDashboardPage = async (req, res) => {
   locals.title = "Admin Dashboard - Node.js";
   let perPage = 12;
   let page = req.query.page || 1;
 
   try {
-    const users = await getUsersCollection
-      .find()
-      .sort({ firstName: 1 })
-      .skip(perPage * page - perPage)
-      .limit(perPage)
-      .toArray();
-
-    const usersCount = await getUsersCollection.countDocuments();
+    const users = await findUsersByFilter(page, perPage);
+    const usersCount = await findUsersCount();
+    const pages = Math.ceil(usersCount / perPage);
 
     res.status(200).render("admin/dashboard", {
       locals,
       users,
       current: page,
-      pages: Math.ceil(usersCount / perPage),
+      pages,
     });
   } catch (error) {
-    console.error(error);
+    console.error(`Error rendering dashboard page: ${error}`);
+    throw error;
   }
 };
 
-/*
- * GET /api/admin/dashboard/about
- * About
+/**
+ * Handle rendering the About page.
+ * Displays information about the Node.js app.
+ * @route GET /api/admin/dashboard/about
  */
-
-const about = async (req, res) => {
+export const renderAboutPage = async (req, res) => {
   locals.title = "About - Node.js";
 
   try {
     res.status(200).render("admin/about", locals);
   } catch (error) {
-    console.error(error);
+    console.error(`Error rendering about page: ${error}`);
+    throw error;
   }
 };
 
 /*
- * GET /api/admin/dashboard/addUser
- * New User Form
+ * Handle displaying user details.
+ * Displays the details of a specific user based on username.
+ * @route GET /api/admin/dashboard/view/:username
  */
+export const renderUserDetails = async (req, res) => {
+  const { username } = req.params;
+  locals.title = "View User - Node.js";
 
-const addUser = async (req, res) => {
-  locals.title = "Add New User - Node.js";
-  res.status(200).render("admin/addUser", { locals });
+  try {
+    const user = await findUserByUsername(username);
+    if (!user) return res.status(404).render("admin/404");
+
+    return res.status(200).render("admin/viewUser", { locals, user });
+  } catch (error) {
+    console.error(`Error rendering user details: ${error}`);
+    throw error;
+  }
 };
 
 /*
- * POST /api/admin/dashboard/postUser
- * Create New User
+ * Handle creating a new user.
+ * Adds a new user to the database and returns success response.
+ * @route POST /api/admin/dashboard/postUser
  */
-
-const postUser = async (req, res) => {
+export const handleAddUser = async (req, res) => {
   const { username, email, tel, role } = req.body;
 
   try {
     const userData = {
       username,
       email,
-      tel: Number(tel),
+      tel,
       role: {
         id: role === "ADMIN" ? 1 : 2,
         name: role,
       },
     };
-    const result = await getUsersCollection.insertOne(userData);
 
+    // Find existing user
+    const user = await findUserByCredentials(username, email, tel);
+    if (user)
+      return res.status(400).json({ success: false, message: "User Exists" });
+
+    // Create user
+    const result = await createUser(userData);
     if (!result)
       return res
         .status(500)
@@ -93,59 +115,24 @@ const postUser = async (req, res) => {
       data: username,
     });
   } catch (error) {
-    console.error(error);
+    console.error(`Error Adding User: ${error}`);
+    throw error;
   }
 };
 
 /*
- * GET /api/admin/dashboard/view/:id
- * View User
+ * Handle updating a user's details.
+ * Updates the user information in the database.
+ * @route PUT /api/admin/dashboard/view/update/:username
  */
 
-const viewUser = async (req, res) => {
-  const { username } = req.params;
-  locals.title = "View User - Node.js";
-
-  try {
-    const user = await getUsersCollection.findOne({ username });
-
-    if (!user) return res.status(404).render("admin/404");
-    return res.status(200).render("admin/viewUser", { locals, user });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-/*
- * GET /api/admin/dashboard/edit/:id
- * Edit User Page
- */
-
-const editUser = async (req, res) => {
-  const { username } = req.params;
-  locals.title = "Edit User - Node.js";
-
-  try {
-    const user = await getUsersCollection.findOne({ username });
-
-    res.status(200).render("admin/editUser", { locals, user });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-/*
- * PUT /api/admin/dashboard/edit/:id
- * Update User
- */
-
-const updateUser = async (req, res) => {
+export const handleUpdateUser = async (req, res) => {
   const { username } = req.params;
   const { email, tel, role } = req.body;
 
   try {
     const updateData = {
-      username: req.body.username,
+      username: req.body.username || username,
       email,
       tel: Number(tel),
       role: {
@@ -154,37 +141,34 @@ const updateUser = async (req, res) => {
       },
     };
 
-    const { modifiedCount } = await getUsersCollection.updateOne(
-      { username },
-      { $set: updateData }
-    );
-
+    const { modifiedCount } = await updateUserData(username, updateData);
     if (!modifiedCount)
       return res
         .status(500)
-        .json({ success: false, message: "Error updating user" });
+        .json({ success: false, message: "Error Updating User" });
 
     return res.status(200).json({
       success: true,
       message: "User Updated",
-      data: req.body.username,
+      data: updateData.username,
     });
   } catch (error) {
     console.error(`Error Updating User: ${error}`);
+    throw error;
   }
 };
 
 /*
- * Delete /api/admin/dashboard/edit/:id
- * Delete User
+ * Handle deleting a user.
+ * Removes the user from the database based on username.
+ * @route DELETE /api/admin/dashboard/view/delete/:username
  */
 
-const deleteUser = async (req, res) => {
+export const handleDeleteUser = async (req, res) => {
   const { username } = req.params;
 
   try {
-    const { deletedCount } = await getUsersCollection.deleteOne({ username });
-
+    const { deletedCount } = await deleteUserData(username);
     if (!deletedCount)
       return res
         .status(500)
@@ -195,15 +179,17 @@ const deleteUser = async (req, res) => {
       .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     console.error(`Error Deleting User: ${error}`);
+    throw error;
   }
 };
 
 /*
- * Post /api/admin/dashboard/searchUser
- * Search User
+ * Handle searching for a user.
+ * Searches for users based on the search term.
+ * @route POST /api/admin/dashboard/searchUser
  */
 
-const searchUser = async (req, res) => {
+export const handleSearchUser = async (req, res) => {
   const { searchTerm } = req.body;
   locals.title = "Search User - Node.js";
 
@@ -211,53 +197,12 @@ const searchUser = async (req, res) => {
     const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9]/g, "");
     const searchCriteria = new RegExp(searchNoSpecialChar, "i");
 
-    const users = await getUsersCollection
-      .find({
-        $or: [
-          { username: searchCriteria },
-          { email: searchCriteria },
-          { tel: searchCriteria },
-        ],
-      })
-      .toArray();
+    const users = await findUsersBySearchCriteria(searchCriteria);
 
     res.render("admin/searchUser", { locals, users });
   } catch (error) {
-    console.error(error);
+    console.error(`Error searching for user(s): ${error}`);
     res.status(500).json({ message: "Internal server error" });
+    throw error;
   }
-};
-
-const adminLogout = async (req, res) => {
-  try {
-    // Clear JWT token cookie
-    await clearCookies(res);
-
-    // Redirect to login page
-    res.redirect("/api/user/");
-  } catch (error) {
-    console.error(`Error in /logout route: ${error}`);
-    res
-      .status(500)
-      .send("Something went wrong. Please logout after some time.");
-  }
-};
-
-function generateAccessToken(admin) {
-  return jwt.sign(admin, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "15m",
-  });
-}
-
-export {
-  dashboard,
-  about,
-  addUser,
-  postUser,
-  viewUser,
-  editUser,
-  updateUser,
-  deleteUser,
-  searchUser,
-  adminLogout,
 };
