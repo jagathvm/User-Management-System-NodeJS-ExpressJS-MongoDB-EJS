@@ -122,12 +122,14 @@ export const handleUserSignup = async (req, res) => {
         .json({ success: false, message: "User already exists." });
 
     // Create user
-    const { acknowledged, insertedId } = await createUser({
+    const userData = {
       username,
       tel,
       email,
       password,
-    });
+    };
+
+    const { acknowledged, insertedId } = await createUser(userData);
     if (!acknowledged)
       return res.status(500).json({
         success: false,
