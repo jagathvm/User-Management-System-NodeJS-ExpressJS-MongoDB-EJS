@@ -71,8 +71,8 @@ export const createUser = async (data) => {
     };
 
     const result = await getUsersCollection.insertOne(userData);
-    console.log(result);
     if (!result) return null;
+
     return result;
   } catch (error) {
     console.error("Error in creating user:", error);
