@@ -22,6 +22,16 @@ export const findUserByEmail = async (email) => {
   }
 };
 
+export const findUserByUsername = async (username) => {
+  try {
+    const user = await getUsersCollection.findOne({ username });
+    return user;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 export const findUserByCredentials = async (username, email, tel) => {
   try {
     const user = await getUsersCollection.findOne({
