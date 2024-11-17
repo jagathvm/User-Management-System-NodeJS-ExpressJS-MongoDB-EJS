@@ -64,7 +64,7 @@ const createUser = async (data) => {
       tel,
       email,
       password: passwordHash,
-      role: {
+      role: data.role || {
         id: 2,
         name: "USER",
       },
