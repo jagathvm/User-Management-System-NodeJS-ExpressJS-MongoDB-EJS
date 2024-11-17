@@ -2,6 +2,7 @@ import {
   createUser,
   findUserByCredentials,
   findUserByEmail,
+  findUserById,
 } from "../services/userServices.js";
 import {
   comparePasswords,
@@ -10,28 +11,61 @@ import {
 } from "../helpers/authHelpers.js";
 
 // ===== Render Pages ===== //
+
+/**
+ * Render the login page.
+ * @route GET /api/user/login
+ */
 export const renderLoginPage = (req, res) => {
   res.status(200).render("user/userSignIn");
 };
 
+/**
+ * Render the signup page.
+ * @route GET /api/user/signup
+ */
 export const renderSignupPage = (req, res) => {
   res.status(200).render("user/userSignup");
 };
 
+/**
+ * Render the about page.
+ * @route GET /api/user/about
+ */
 export const renderAboutPage = (req, res) => {
   res.status(200).render("user/about");
 };
 
-export const renderHomePage = (req, res) => {
-  // Extract from token middleware
-  const { username } = req.user;
+/**
+ * Render the home page.
+ * Retrieves the username from the database based on the authenticated user's ID.
+ * @route GET /api/user/home
+ * @param {Object} req.user - User object from authentication middleware.
+ */
+export const renderHomePage = async (req, res) => {
+  const { id } = req.user;
 
-  res.status(200).render("user/home", {
-    username,
-  });
+  try {
+    const user = await findUserById(id);
+    if (!user) return res.status(404).render("user/404");
+
+    const { username } = user;
+    res.status(200).render("user/home", {
+      username,
+    });
+  } catch (error) {
+    console.error(`Error rendering home page: ${error}`);
+    throw error;
+  }
 };
 
 // ===== Authentication Handlers ===== //
+
+/**
+ * Handle user login.
+ * Validates email and password, sets JWT cookies upon successful login.
+ * @route POST /api/user/login
+ */
 export const handleUserLogin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -40,7 +74,7 @@ export const handleUserLogin = async (req, res) => {
     if (!user)
       return res
         .status(400)
-        .json({ success: false, message: "Invalid email or password." });
+        .json({ success: false, message: "Email is not registered." });
 
     const passwordsMatch = await comparePasswords(password, user.password);
     if (!passwordsMatch)
@@ -49,7 +83,8 @@ export const handleUserLogin = async (req, res) => {
         .json({ success: false, message: "Invalid email or password." });
 
     // Set JWT cookies
-    await setCookies(res, user);
+    const cookiesSet = await setCookies(res, user._id);
+    if (!cookiesSet) throw new Error("Failed to set authentication cookies.");
 
     // Redirect based on role
     return res.status(200).json({
@@ -66,6 +101,11 @@ export const handleUserLogin = async (req, res) => {
   }
 };
 
+/**
+ * Handle user signup.
+ * Creates a new user and sets JWT cookies for authentication.
+ * @route POST /api/user/signup
+ */
 export const handleUserSignup = async (req, res) => {
   const { username, tel, email, password, passwordConfirm } = req.body;
 
@@ -73,7 +113,7 @@ export const handleUserSignup = async (req, res) => {
     if (password !== passwordConfirm)
       return res
         .status(401)
-        .json({ success: false, message: "Passwords Do not match" });
+        .json({ success: false, message: "Passwords do not match" });
 
     // Check if user already exists
     const userExists = await findUserByCredentials(username, email, tel);
@@ -83,14 +123,20 @@ export const handleUserSignup = async (req, res) => {
         .json({ success: false, message: "User already exists." });
 
     // Create user
-    const user = await createUser(res, { username, tel, email, password });
-    if (!user)
+    const { acknowledged, insertedId } = await createUser({
+      username,
+      tel,
+      email,
+      password,
+    });
+    if (!acknowledged)
       return res.status(500).json({
         success: false,
         message: "Something went wrong. Please signup after sometime",
       });
 
-    await setCookies(res, user);
+    const cookiesSet = await setCookies(res, insertedId);
+    if (!cookiesSet) throw new Error("Failed to set authentication cookies.");
 
     res.status(201).json({ success: true, message: "Signup successful." });
   } catch (error) {
@@ -102,6 +148,11 @@ export const handleUserSignup = async (req, res) => {
   }
 };
 
+/**
+ * Handle user logout.
+ * Clears authentication cookies and redirects the user to the login page.
+ * @route GET /api/user/logout
+ */
 export const handleUserLogout = async (req, res) => {
   try {
     // Clear token cookies
