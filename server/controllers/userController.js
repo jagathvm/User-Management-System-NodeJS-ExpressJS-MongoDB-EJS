@@ -83,8 +83,7 @@ export const handleUserLogin = async (req, res) => {
         .json({ success: false, message: "Invalid email or password." });
 
     // Set JWT cookies
-    const cookiesSet = await setCookies(res, user._id);
-    if (!cookiesSet) throw new Error("Failed to set authentication cookies.");
+    await setCookies(res, user._id);
 
     // Redirect based on role
     return res.status(200).json({
@@ -135,8 +134,8 @@ export const handleUserSignup = async (req, res) => {
         message: "Something went wrong. Please signup after sometime",
       });
 
-    const cookiesSet = await setCookies(res, insertedId);
-    if (!cookiesSet) throw new Error("Failed to set authentication cookies.");
+    // Set JWT cookies
+    await setCookies(res, insertedId);
 
     res.status(201).json({ success: true, message: "Signup successful." });
   } catch (error) {
