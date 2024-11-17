@@ -54,7 +54,7 @@ const findUsersBySearchCriteria = async (searchCriteria) => {
   }
 };
 
-const createUser = async (res, data) => {
+const createUser = async (data) => {
   const { username, tel, email, password } = data;
 
   try {
@@ -77,8 +77,6 @@ const createUser = async (res, data) => {
 
     const user = await findUserById(insertedId);
     if (!user) return null;
-
-    await setCookies(res, user);
 
     return user;
   } catch (error) {
