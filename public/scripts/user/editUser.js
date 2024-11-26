@@ -1,13 +1,9 @@
 import { apiClient } from "../apiServices/httpRequest.js";
+import { handleRedirect } from "../helpers/handleRedirect.js";
 
 const updateUserForm = document.getElementById("updateUserForm");
 const deleteUserForm = document.getElementById("deleteUserForm");
 const username = document.getElementById("username").value;
-
-const handleRedirect = (message, url) => {
-  alert(message);
-  window.location.href = url;
-};
 
 // Fetch data from updateUser Form
 updateUserForm.addEventListener("submit", async (e) => {
@@ -29,8 +25,10 @@ updateUserForm.addEventListener("submit", async (e) => {
       "PUT",
       data
     );
+    alert(result.message);
+    if (!result.success) return;
 
-    handleRedirect(result.message, `/api/admin/dashboard/view/${username}`);
+    handleRedirect(`/api/admin/dashboard/view/${username}`);
   } catch (error) {
     console.error("Error in updating user:", error);
     alert("An error occurred during user update. Please try again later.");
@@ -47,8 +45,10 @@ deleteUserForm.addEventListener("submit", async (e) => {
       `/admin/dashboard/view/delete/${username}`,
       "DELETE"
     );
+    alert(result.message);
+    if (!result.success) return;
 
-    handleRedirect(result.message, "/api/admin/dashboard");
+    handleRedirect("/api/admin/dashboard");
   } catch (error) {
     console.error("Error in deleting user:", error);
     alert("An error occurred during user deletion. Please try again later.");

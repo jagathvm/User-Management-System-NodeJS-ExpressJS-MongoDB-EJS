@@ -1,4 +1,5 @@
 import { apiClient } from "../apiServices/httpRequest.js";
+import { handleRedirect } from "../helpers/handleRedirect.js";
 const formSignUp = document.getElementById("formSignUp");
 
 formSignUp.addEventListener("submit", async (e) => {
@@ -26,12 +27,14 @@ formSignUp.addEventListener("submit", async (e) => {
 
   try {
     const result = await apiClient.httpRequest("/user/signup", "POST", data);
-
     alert(result.message);
-    if (result.success) {
-      formSignUp.reset(); // Clear the form
-      window.location.href = "/api/user/home";
-    }
+    if (!result.success) return;
+
+    // Reset form after successful submission
+    formSignUp.reset();
+
+    // Redirect to the appropriate page
+    handleRedirect("/api/user/home");
   } catch (error) {
     console.error(`Error during signup: ${error}`);
     alert("An error occurred during signup. Please try again.");

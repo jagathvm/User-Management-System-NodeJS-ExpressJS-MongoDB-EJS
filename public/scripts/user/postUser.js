@@ -1,4 +1,5 @@
 import { apiClient } from "../apiServices/httpRequest.js";
+import { handleRedirect } from "../helpers/handleRedirect.js";
 const addUserForm = document.getElementById("addUserForm");
 
 // Fetch data from addUser Form
@@ -27,12 +28,10 @@ addUserForm.addEventListener("submit", async (e) => {
       "POST",
       data
     );
-
-    if (!result.success) {
-      alert(result.message);
-    }
     alert(result.message);
-    window.location.href = `/api/admin/dashboard/view/${result.data}`;
+    if (!result.success) return;
+
+    handleRedirect(`/api/admin/dashboard/view/${result.data}`);
   } catch (error) {
     console.error(error);
   }
