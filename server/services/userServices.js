@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getUsersCollection } from "../config/db.js";
-import { hashedPassword } from "../helpers/authHelpers.js";
+import { formatDate, hashedPassword } from "../helpers/userHelpers.js";
 
 export const findUserById = async (id) => {
   try {
@@ -104,6 +104,12 @@ export const createUser = async (data) => {
         id: 2,
         name: "USER",
       },
+      accountStatus: data.accountStatus || {
+        status: "ACTIVE",
+        createdAt: formatDate(new Date()),
+        lastLogin: null,
+        lastUpdated: null,
+      },
     };
 
     const result = await getUsersCollection.insertOne(userData);
@@ -120,7 +126,11 @@ export const updateUserData = async (username, data) => {
   try {
     const result = await getUsersCollection.updateOne(
       { username },
-      { $set: data }
+      {
+        $set: {
+          ...data,
+        },
+      }
     );
     return result;
   } catch (error) {
