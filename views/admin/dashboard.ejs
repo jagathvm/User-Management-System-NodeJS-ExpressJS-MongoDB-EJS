@@ -18,6 +18,7 @@
         <th scope="col">Email</th>
         <th scope="col">Telephone</th>
         <th scope="col">Role</th>
+        <th scope="col">Status</th>
         <th scope="col" class="text-end">Action</th>
       </tr>
     </thead>
@@ -28,6 +29,7 @@
         <td><%= user.email %></td>
         <td><%= user.tel %></td>
         <td><%= user.role.name %></td>
+        <td><%= user.accountStatus.isActive ? "ACTIVE" : "INACTIVE" %></td>
         <td>
           <div class="d-flex flex-row justify-content-end gap-2">
             <a href="/api/admin/dashboard/view/<%= user.username %>" class="btn btn-primary btn-sm">
@@ -74,13 +76,6 @@
             <select class="form-control" id="role" name="role" required>
               <option value="USER" selected>USER</option>
               <option value="ADMIN">ADMIN</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select class="form-control" id="status" name="status" required>
-              <option value="ACTIVE" selected>ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
             </select>
           </div>
         </div>
