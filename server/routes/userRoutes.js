@@ -24,13 +24,6 @@ router.get("/", userController.renderLoginPage);
 router.get("/signup", userController.renderSignupPage);
 
 /**
- * @route   GET /logout
- * @desc    Log out the user and clear cookies
- * @access  Public
- */
-router.get("/logout", userController.handleUserLogout);
-
-/**
  * @route   POST /
  * @desc    Handle user login
  * @access  Public
@@ -62,5 +55,12 @@ router.get("/home", userController.renderHomePage);
  * @access  Protected
  */
 router.get("/about", userController.renderAboutPage);
+
+/**
+ * @route   GET /logout
+ * @desc    Log out the user and clear cookies
+ * @access  Public
+ */
+router.get("/logout", userController.handleUserLogout);
 
 export default router;
