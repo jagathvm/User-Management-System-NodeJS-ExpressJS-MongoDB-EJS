@@ -21,7 +21,7 @@ body {
   /* rtl:remove */
   left: 0;
   z-index: 100; /* Behind the navbar */
-  padding: 48px 0 0; /* Height of navbar */
+  padding: 12px 0 0; /* Height of navbar */
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -95,4 +95,57 @@ body {
 .form-control-dark:focus {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+}
+
+/* Toolbar Container */
+.toolbar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1rem 0; /* Adjust padding for spacing */
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ddd; /* Border styling for section separation */
+  background-color: #f8f9fa; /* Subtle background color */
+}
+
+/* Button Toolbar */
+.btn-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem; /* Add spacing between elements */
+}
+
+/* Input Styling */
+.search-input {
+  width: 300px; /* Set a consistent width */
+  padding: 0.5rem; /* Add padding for better usability */
+  border-radius: 5px; /* Smooth corners */
+  border: 1px solid #ccc; /* Border styling */
+  font-size: 1rem;
+  transition: all 0.3s ease-in-out; /* Smooth transition for focus */
+}
+
+.search-input:focus {
+  outline: none; /* Remove default outline */
+  border-color: #007bff; /* Highlight border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add focus shadow */
+}
+
+/* Form Alignment */
+#searchUserForm {
+  margin: 0; /* Remove default margin */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .toolbar-container {
+    flex-direction: column;
+    padding: 0.5rem 0;
+  }
+
+  .search-input {
+    width: 100%; /* Full width on smaller screens */
+  }
 }
