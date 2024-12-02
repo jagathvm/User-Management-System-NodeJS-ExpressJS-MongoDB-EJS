@@ -3,12 +3,15 @@ import {
   findUserByCredentials,
   findUserByEmail,
   findUserById,
+  updateUserData,
 } from "../services/userServices.js";
 import {
+  handleFetchUserFromRequest,
   comparePasswords,
   clearCookies,
   setCookies,
-} from "../helpers/authHelpers.js";
+} from "../helpers/userHelpers.js";
+import { formatDateToISOString } from "../helpers/userHelpers.js";
 
 // ===== Render Pages ===== //
 
@@ -17,7 +20,7 @@ import {
  * @route GET /api/user/login
  */
 export const renderLoginPage = (req, res) => {
-  res.status(200).render("user/userSignIn");
+  res.status(200).render("user/userSignIn", { req });
 };
 
 /**
@@ -25,15 +28,22 @@ export const renderLoginPage = (req, res) => {
  * @route GET /api/user/signup
  */
 export const renderSignupPage = (req, res) => {
-  res.status(200).render("user/userSignup");
+  res.status(200).render("user/userSignup", { req });
 };
 
 /**
  * Render the about page.
  * @route GET /api/user/about
  */
-export const renderAboutPage = (req, res) => {
-  res.status(200).render("user/about");
+export const renderAboutPage = async (req, res) => {
+  try {
+    const { username, roleId } = await handleFetchUserFromRequest(req, res);
+
+    res.status(200).render("user/about", { req, username, roleId });
+  } catch (error) {
+    console.error(`Error rendering about page: ${error}`);
+    throw error;
+  }
 };
 
 /**
@@ -43,20 +53,26 @@ export const renderAboutPage = (req, res) => {
  * @param {Object} req.user - User object from authentication middleware.
  */
 export const renderHomePage = async (req, res) => {
-  const { id } = req.user;
-
   try {
-    const user = await findUserById(id);
-    if (!user) return res.status(404).render("user/404");
+    const { username, roleId } = await handleFetchUserFromRequest(req, res);
 
-    const { username } = user;
     res.status(200).render("user/home", {
       username,
+      roleId,
+      req,
     });
   } catch (error) {
     console.error(`Error rendering home page: ${error}`);
     throw error;
   }
+};
+
+/**
+ * Render the 404 page.
+ * @route GET /api/user/404
+ */
+export const render404Page = (req, res) => {
+  res.status(404).render("user/404", { req });
 };
 
 // ===== Authentication Handlers ===== //
@@ -81,6 +97,23 @@ export const handleUserLogin = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Invalid email or password." });
+
+    const { modifiedCount } = await updateUserData(user.username, {
+      "accountStatus.lastLogin": formatDateToISOString(new Date()),
+      "accountStatus.isActive": true,
+    });
+    if (!modifiedCount)
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please login after sometime",
+      });
+
+    // Check if user is blocked
+    if (user.accountStatus.isBlocked)
+      return res.status(401).json({
+        success: false,
+        message: "Your account is temporarily blocked",
+      });
 
     // Set JWT cookies
     await setCookies(res, user._id);
@@ -127,6 +160,16 @@ export const handleUserSignup = async (req, res) => {
       tel,
       email,
       password,
+      role: {
+        id: 2,
+        name: "USER",
+      },
+      accountStatus: {
+        isActive: true,
+        createdAt: formatDateToISOString(new Date()),
+        lastLogin: formatDateToISOString(new Date()),
+        lastUpdated: null,
+      },
     };
 
     const { acknowledged, insertedId } = await createUser(userData);
@@ -155,10 +198,22 @@ export const handleUserSignup = async (req, res) => {
  * @route GET /api/user/logout
  */
 export const handleUserLogout = async (req, res) => {
+  const { id } = req.user;
   try {
+    const { username } = await findUserById(id);
+
+    const { modifiedCount } = await updateUserData(username, {
+      "accountStatus.isActive": false,
+    });
+
+    if (!modifiedCount)
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong. Please logout after sometime",
+      });
+
     // Clear token cookies
     await clearCookies(res);
-
     // Redirect to login page
     res.redirect("/api/user/");
   } catch (error) {
