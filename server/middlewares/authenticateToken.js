@@ -5,7 +5,6 @@ export const authenticateToken = (req, res, next) => {
   const { accessToken } = req.cookies;
   if (!accessToken) {
     if (req.originalUrl.startsWith("/api/user")) {
-      console.log("rendering user 404");
       return res.status(404).redirect("/api/user/404");
     }
     return res.render("admin/404", { req });
