@@ -1,14 +1,18 @@
-import { getUsersCollection } from "../config/db.js";
 import {
+  blockOrUnblockUser,
   createUser,
   deleteUserData,
   findUserByCredentials,
   findUserByUsername,
   findUsersByFilter,
-  findUsersBySearchCriteria,
   findUsersCount,
   updateUserData,
 } from "../services/userServices.js";
+import {
+  formatDateToISOString,
+  formatDateToLocaleString,
+  sanitizeQuery,
+} from "../helpers/userHelpers.js";
 
 const locals = {
   description: "Nodejs USER Management System",
@@ -19,18 +23,18 @@ const locals = {
  * Displays a list of users with pagination.
  * @route GET /api/admin/dashboard
  */
-
 export const renderDashboardPage = async (req, res) => {
   locals.title = "Admin Dashboard - Node.js";
-  let perPage = 12;
-  let page = req.query.page || 1;
 
   try {
-    const users = await findUsersByFilter(page, perPage);
-    const usersCount = await findUsersCount();
-    const pages = Math.ceil(usersCount / perPage);
+    const { filter, sort, page, limit } = sanitizeQuery(req.query);
+
+    const users = await findUsersByFilter(filter, sort, page, limit);
+    const usersCount = await findUsersCount(filter);
+    const pages = Math.ceil(usersCount / limit);
 
     res.status(200).render("admin/dashboard", {
+      req,
       locals,
       users,
       current: page,
@@ -51,14 +55,14 @@ export const renderAboutPage = async (req, res) => {
   locals.title = "About - Node.js";
 
   try {
-    res.status(200).render("admin/about", locals);
+    res.status(200).render("admin/about", { req, locals });
   } catch (error) {
     console.error(`Error rendering about page: ${error}`);
     throw error;
   }
 };
 
-/*
+/**
  * Handle displaying user details.
  * Displays the details of a specific user based on username.
  * @route GET /api/admin/dashboard/view/:username
@@ -71,36 +75,50 @@ export const renderUserDetails = async (req, res) => {
     const user = await findUserByUsername(username);
     if (!user) return res.status(404).render("admin/404");
 
-    return res.status(200).render("admin/viewUser", { locals, user });
+    return res.status(200).render("admin/viewUser", {
+      req,
+      locals,
+      user,
+      formatDateToLocaleString,
+    });
   } catch (error) {
     console.error(`Error rendering user details: ${error}`);
     throw error;
   }
 };
 
-/*
+/**
  * Handle creating a new user.
  * Adds a new user to the database and returns success response.
  * @route POST /api/admin/dashboard/postUser
  */
 export const handleAddUser = async (req, res) => {
-  const { username, email, tel, role } = req.body;
+  const { username, email, tel, password, role } = req.body;
 
   try {
     const userData = {
       username,
       email,
       tel,
+      password,
       role: {
         id: role === "ADMIN" ? 1 : 2,
         name: role,
+      },
+      accountStatus: {
+        isActive: false,
+        createdAt: formatDateToISOString(new Date()),
+        updatedAt: null,
+        lastLogin: null,
       },
     };
 
     // Find existing user
     const user = await findUserByCredentials(username, email, tel);
     if (user)
-      return res.status(400).json({ success: false, message: "User Exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User Already Exists" });
 
     // Create user
     const result = await createUser(userData);
@@ -110,7 +128,7 @@ export const handleAddUser = async (req, res) => {
         .json({ success: false, message: "Error Adding User" });
 
     return res.status(200).json({
-      success: false,
+      success: true,
       message: "User Added Successfully",
       data: username,
     });
@@ -120,12 +138,11 @@ export const handleAddUser = async (req, res) => {
   }
 };
 
-/*
+/**
  * Handle updating a user's details.
  * Updates the user information in the database.
  * @route PUT /api/admin/dashboard/view/update/:username
  */
-
 export const handleUpdateUser = async (req, res) => {
   const { username } = req.params;
   const { email, tel, role } = req.body;
@@ -139,6 +156,7 @@ export const handleUpdateUser = async (req, res) => {
         id: role === "ADMIN" ? 1 : 2,
         name: role,
       },
+      "accountStatus.updatedAt": formatDateToISOString(new Date()),
     };
 
     const { modifiedCount } = await updateUserData(username, updateData);
@@ -158,12 +176,34 @@ export const handleUpdateUser = async (req, res) => {
   }
 };
 
-/*
+/**
+ * Handle blocking or unblocking a user.
+ * Updates the user's blocking status in the database.
+ * @route PUT /api/admin/dashboard/view/block/:username
+ */
+export const handleBlockOrUnblockUser = async (req, res) => {
+  const { username } = req.params;
+  const isBlocked = req.body.isBlocked === "true" ? true : false;
+
+  try {
+    const { success, message } = await blockOrUnblockUser(
+      username,
+      res,
+      isBlocked
+    );
+
+    return res.status(200).json({ success, message });
+  } catch (error) {
+    console.error(`Error Blocking User: ${error}`);
+    throw error;
+  }
+};
+
+/**
  * Handle deleting a user.
  * Removes the user from the database based on username.
  * @route DELETE /api/admin/dashboard/view/delete/:username
  */
-
 export const handleDeleteUser = async (req, res) => {
   const { username } = req.params;
 
@@ -179,30 +219,6 @@ export const handleDeleteUser = async (req, res) => {
       .json({ success: true, message: "User deleted successfully" });
   } catch (error) {
     console.error(`Error Deleting User: ${error}`);
-    throw error;
-  }
-};
-
-/*
- * Handle searching for a user.
- * Searches for users based on the search term.
- * @route POST /api/admin/dashboard/searchUser
- */
-
-export const handleSearchUser = async (req, res) => {
-  const { searchTerm } = req.body;
-  locals.title = "Search User - Node.js";
-
-  try {
-    const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9]/g, "");
-    const searchCriteria = new RegExp(searchNoSpecialChar, "i");
-
-    const users = await findUsersBySearchCriteria(searchCriteria);
-
-    res.render("admin/searchUser", { locals, users });
-  } catch (error) {
-    console.error(`Error searching for user(s): ${error}`);
-    res.status(500).json({ message: "Internal server error" });
     throw error;
   }
 };
