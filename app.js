@@ -10,6 +10,7 @@ import { connectToDB } from "./server/config/db.js";
 // Routes
 import userRoutes from "./server/routes/userRoutes.js";
 import adminRoutes from "./server/routes/adminRoutes.js";
+
 import { setLayout } from "./server/middlewares/setLayout.js";
 
 const app = express();
@@ -37,7 +38,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // User and Admin Routes
-app.use("/api/user/", userRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.listen(PORT, () => {
