@@ -1,113 +1,134 @@
-<div class="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h1">
-    <%= user.firstName %>
+<div class="d-flex justify-content-between align-items-center flex-wrap flex-md-nowrap pt-4 pb-3 mb-3 border-bottom">
+  <h1 class="h1 d-flex align-items-center fw-bold text-primary">
+    <i class="bi bi-person-circle me-2"></i> <%= user.username %>
   </h1>
 </div>
 
 <div class="col py-3">
-  <div class="row">
+  <div class="row align-items-center">
+    <!-- Breadcrumb Section -->
     <div class="col">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/api/admin/dashboard">Dashboard</a></li>
-          <li class="breadcrumb-item active">
+          <li class="breadcrumb-item fw-bold">
+            <a href="/api/admin/dashboard" class="text-decoration-none text-primary">
+              Dashboard
+            </a>
+          </li>
+          <li class="breadcrumb-item active fw-bold" aria-current="page">
             <%= user.username %>
           </li>
         </ol>
       </nav>
     </div>
-    <div class="col text-end fw-lighter">
-      <b>UserId: </b> <%= user._id %>
+
+    <!-- UserId Section -->
+    <div class="col text-end">
+      <b class="fw-medium text-muted text-uppercase">UserId: </b>
+      <span class="fw-medium text-dark text-uppercase"><%= user._id %></span>
     </div>
   </div>
 </div>
 
-<ul class="list-group mb-3">
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Username:</b></div>
-      <div class="col">
-        <%= user.username %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Email:</b></div>
-      <div class="col">
-        <%= user.email %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Telephone:</b></div>
-      <div class="col">
-        <%= user.tel %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Role:</b></div>
-      <div class="col">
-        <%= user.role.name %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Status:</b></div>
-      <div class="col">
-        <%= user.accountStatus.isActive ? "ACTIVE" : "INACTIVE"  %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Created At:</b></div>
-      <div class="col">
-        <%= user.accountStatus.createdAt || "N/A" %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Updated At:</b></div>
-      <div class="col">
-        <%= user.accountStatus.updatedAt || "N/A" %>
-      </div>
-    </div>
-  </li>
-  <li class="list-group-item">
-    <div class="row">
-      <div class="col" style="max-width: 140px;"><b>Last Login:</b></div>
-      <div class="col">
-        <%= user.accountStatus.lastLogin || "N/A" %>
-      </div>
-    </div>
-  </li>
+<!-- User Details Card -->
+<div class="card mb-4 shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0 fw-bold">User Details</h5>
+  </div>
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      <!-- Username -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Username:</strong>
+        <span class="text-secondary" style="font-weight: 600;"><%= user.username %></span>
+      </li>
 
-</ul>
+      <!-- Email -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Email:</strong>
+        <span class="text-secondary" style="font-weight: 600;"><%= user.email %></span>
+      </li>
 
-<div class="d-flex justify-content-end gap-2">
+      <!-- Telephone -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Telephone:</strong>
+        <span class="text-secondary" style="font-weight: 600;"><%= user.tel %></span>
+      </li>
+
+      <!-- Role -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Role:</strong>
+        <button class="badge pe-none px-2 py-1 fw-normal border border-light
+          <%= user.role.name === 'ADMIN' ? 'text-bg-warning' : 'text-bg-primary' %>
+          text-uppercase">
+          <%= user.role.name %>
+        </button>
+      </li>
+
+      <!-- Status -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Status:</strong>
+        <button class="badge pe-none fw-normal border border-light
+          <%= user.accountStatus.isActive ? 'text-bg-success' : 'text-bg-secondary' %>
+          text-uppercase">
+          <%= user.accountStatus.isActive ? 'Active' : 'Inactive' %>
+        </button>
+      </li>
+
+      <!-- Created At -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Created At:</strong>
+        <% if (user.accountStatus.createdAt) { %>
+        <span class="text-secondary" style="font-weight: 600;"><%= user.accountStatus.createdAt %></span>
+        <% } else { %>
+        <span class="badge badge-pill text-bg-light" style="font-weight: 600;">N/A</span>
+        <% } %>
+      </li>
+
+      <!-- Updated At -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark fw-bold">Updated At:</strong>
+        <% if (user.accountStatus.updatedAt) { %>
+        <span class="text-secondary" style="font-weight: 600;"><%= user.accountStatus.updatedAt %></span>
+        <% } else { %>
+        <span class="badge badge-pill pe-none
+         text-bg-light" style="font-weight: 600;">N/A</span>
+        <% } %>
+      </li>
+
+      <!-- Last Login -->
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <strong class="text-dark">Last Login:</strong>
+        <% if (user.accountStatus.lastLogin) { %>
+        <span class="text-secondary fw-bold" style="font-weight: 600;"><%= user.accountStatus.lastLogin %></span>
+        <% } else { %>
+        <span class="badge badge-pill text-bg-secondary">N/A</span>
+        <% } %>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="d-flex justify-content-end gap-3">
   <!-- Edit User Button -->
   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editUserModal">
-    Edit User Details
+    <i class="bi bi-pencil me-2"></i>Edit User Details
   </button>
   <!-- Block/Unblock User Button -->
-  <button type="button" class="<%= user.accountStatus.isBlocked ? 'btn btn-success' : 'btn btn-warning' %>" data-bs-toggle="modal" data-bs-target="#blockUserModal">
+  <button type="button" class="btn <%= user.accountStatus.isBlocked ? 'btn-success' : 'btn-warning' %>" data-bs-toggle="modal" data-bs-target="#blockUserModal">
+    <i class="bi <%= user.accountStatus.isBlocked ? 'bi-unlock' : 'bi-lock' %> me-2"></i>
     <%= user.accountStatus.isBlocked ? "Unblock User" : "Block User" %>
   </button>
   <!-- Delete User Button -->
   <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
-    Delete User
+    <i class="bi bi-trash me-2"></i>Delete User
   </button>
 </div>
 
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form id="updateUserForm">
         <div class="modal-header">
@@ -158,8 +179,9 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="<%= user.accountStatus.isBlocked ? 'btn btn-success' : 'btn btn-warning' %>"><%= user.accountStatus.isBlocked ? 'Unblock User' : 'Block User' %></button>
+          <button type="submit" class="btn <%= user.accountStatus.isBlocked ? 'btn-success' : 'btn-warning' %>"><%= user.accountStatus.isBlocked ? 'Unblock User' : 'Block User' %></button>
         </div>
+        <input value="<%= user.accountStatus.isBlocked %>" name="isBlocked" hidden>
       </form>
     </div>
   </div>
