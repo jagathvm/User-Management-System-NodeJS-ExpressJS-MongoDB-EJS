@@ -24,6 +24,13 @@ router.get("/", userController.renderLoginPage);
 router.get("/signup", userController.renderSignupPage);
 
 /**
+ * @route   GET /404
+ * @desc    Render the 404 page
+ * @access  Public
+ */
+router.get("/404", userController.render404Page);
+
+/**
  * @route   POST /
  * @desc    Handle user login
  * @access  Public
