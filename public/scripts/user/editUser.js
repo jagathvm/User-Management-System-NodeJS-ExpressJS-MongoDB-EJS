@@ -2,6 +2,7 @@ import { apiClient } from "../apiServices/httpRequest.js";
 import { handleRedirect } from "../helpers/handleRedirect.js";
 
 const updateUserForm = document.getElementById("updateUserForm");
+const blockUserForm = document.getElementById("blockUserForm");
 const deleteUserForm = document.getElementById("deleteUserForm");
 const username = document.getElementById("username").value;
 
@@ -32,6 +33,30 @@ updateUserForm.addEventListener("submit", async (e) => {
   } catch (error) {
     console.error("Error in updating user:", error);
     alert("An error occurred during user update. Please try again later.");
+    throw error;
+  }
+});
+
+// Block user data when submit event is triggered
+blockUserForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(blockUserForm);
+  const data = Object.fromEntries(formData);
+
+  try {
+    const { success, message } = await apiClient.httpRequest(
+      `/admin/dashboard/view/block/${username}`,
+      "PUT",
+      data
+    );
+
+    alert(message);
+    if (!success) return;
+
+    handleRedirect(`/api/admin/dashboard/view/${username}`);
+  } catch (error) {
+    console.error("Error in blocking user:", error);
     throw error;
   }
 });
