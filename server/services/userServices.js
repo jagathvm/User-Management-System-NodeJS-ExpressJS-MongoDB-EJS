@@ -1,6 +1,9 @@
 import { ObjectId } from "mongodb";
 import { getUsersCollection } from "../config/db.js";
-import { formatDate, hashedPassword } from "../helpers/userHelpers.js";
+import {
+  formatDateToISOString,
+  hashedPassword,
+} from "../helpers/userHelpers.js";
 
 export const findUserById = async (id) => {
   try {
@@ -35,7 +38,7 @@ export const findUserByUsername = async (username) => {
 export const findUserByCredentials = async (username, email, tel) => {
   try {
     const user = await getUsersCollection.findOne({
-      $or: [{ username }, { email }, { tel }],
+      $or: [{ username }, { email }, { tel: parseInt(tel) }],
     });
 
     return user;
@@ -64,13 +67,18 @@ export const findUsersBySearchCriteria = async (searchCriteria) => {
   }
 };
 
-export const findUsersByFilter = async (page, perPage) => {
+export const findUsersByFilter = async (
+  filter = {},
+  sort = {},
+  page = 1,
+  limit = 5
+) => {
   try {
     const users = await getUsersCollection
-      .find()
-      .sort({ firstName: 1 })
-      .skip(perPage * page - perPage)
-      .limit(perPage)
+      .find(filter)
+      .sort(sort)
+      .skip(limit * page - limit)
+      .limit(limit)
       .toArray();
 
     return users;
@@ -80,9 +88,9 @@ export const findUsersByFilter = async (page, perPage) => {
   }
 };
 
-export const findUsersCount = async () => {
+export const findUsersCount = async (filter = {}) => {
   try {
-    const usersCount = await getUsersCollection.countDocuments();
+    const usersCount = await getUsersCollection.countDocuments(filter);
     return usersCount;
   } catch (error) {
     console.error(`Error in findUsersCount: ${error}`);
@@ -106,7 +114,7 @@ export const createUser = async (data) => {
       },
       accountStatus: data.accountStatus || {
         status: "ACTIVE",
-        createdAt: formatDate(new Date()),
+        createdAt: formatDateToISOString(new Date()),
         lastLogin: null,
         lastUpdated: null,
       },
@@ -135,6 +143,41 @@ export const updateUserData = async (username, data) => {
     return result;
   } catch (error) {
     console.error("Error in updating user:", error);
+    throw error;
+  }
+};
+
+export const blockOrUnblockUser = async (username, res, isBlocked) => {
+  try {
+    // Unblock User
+    if (isBlocked === true) {
+      const { modifiedCount } = await updateUserData(username, {
+        "accountStatus.isBlocked": false,
+      });
+
+      if (!modifiedCount)
+        return { success: false, message: "Error Unblocking User" };
+
+      return {
+        success: true,
+        message: "User Unblocked",
+      };
+    }
+
+    // Block User
+    const { modifiedCount } = await updateUserData(username, {
+      "accountStatus.isBlocked": true,
+    });
+
+    if (!modifiedCount)
+      return { success: false, message: "Error Blocking User" };
+
+    return {
+      success: true,
+      message: "User Blocked",
+    };
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };
