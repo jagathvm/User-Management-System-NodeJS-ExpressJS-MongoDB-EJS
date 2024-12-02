@@ -1,20 +1,30 @@
 <!-- Checking if there are users to paginate -->
-<% if (users.length> 0 ) { %>
+<% if (users.length > 0) { %>
 
 <!-- Start of Pagination Navigation -->
 <nav aria-label="Dashboard Pagination">
   <ul class="pagination justify-content-center mt-4">
 
+    <!-- Helper Function to Retain Query Parameters -->
+    <% const buildUrl = (page) => {
+      // Get current query parameters
+      const queryParams = new URLSearchParams(req.query);
+      // Update the page parameter
+      queryParams.set('page', page);
+      // Return the updated query string
+      return `?${queryParams.toString()}`;
+    }; %>
+
     <!-- First Page Link -->
-    <% if (current==1) { %>
-    <li class="page-item disabled">
+    <% if (current == 1) { %>
+    <li class="page-item disabled mx-1">
       <a href="#" class="page-link">
         First
       </a>
     </li>
     <% } else { %>
     <li class="page-item">
-      <a href="?page=1" class="page-link">
+      <a href="<%= buildUrl(1) %>" class="page-link">
         First
       </a>
     </li>
@@ -25,40 +35,48 @@
 
     <!-- Ellipsis for Skipped Pages -->
     <% if (i !== 1) { %>
-    <li class="page-item disabled">
+    <li class="page-item disabled mx-1">
       <a href="#" class="page-link">...</a>
     </li>
     <% } %>
 
     <!-- Pagination Buttons -->
-    <% for(; i <= (Number(current) + 4) && i <= pages; i++ ) { %>
+    <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
 
     <!-- Highlight Current Page Button -->
     <% if (i == current) { %>
-    <li class="page-item active">
+    <li class="page-item active mx-1">
       <a href="#" class="page-link">
         <%= i %>
       </a>
     </li>
     <% } else { %>
     <!-- Pagination Button for Non-Current Pages -->
-    <li class="page-item">
-      <a href="?page=<%= i %>" class="page-link">
+    <li class="page-item mx-1">
+      <a href="<%= buildUrl(i) %>" class="page-link">
         <%= i %>
       </a>
     </li>
     <% } %>
+
+    <!-- Ellipsis for Remaining Pages -->
     <% if (i == (Number(current) + 4) && i < pages) { %>
-    <li class="page-item disabled"><a href="#" class="page-link">...</a></li>
+    <li class="page-item disabled mx-1">
+      <a href="#" class="page-link">...</a>
+    </li>
     <% } %>
     <% } %>
 
     <!-- Last Page Link -->
     <% if (current == pages) { %>
-    <li class="page-item disabled"><a href="#" class="page-link">Last</a></li>
+    <li class="page-item disabled mx-1">
+      <a href="#" class="page-link">
+        Last
+      </a>
+    </li>
     <% } else { %>
-    <li class="page-item">
-      <a href="?page=<%= pages %>" class="page-link">
+    <li class="page-item mx-1">
+      <a href="<%= buildUrl(pages) %>" class="page-link">
         Last
       </a>
     </li>
