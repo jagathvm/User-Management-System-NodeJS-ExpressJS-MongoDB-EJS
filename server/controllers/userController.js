@@ -7,11 +7,11 @@ import {
 } from "../services/userServices.js";
 import {
   handleFetchUserFromRequest,
+  formatDateToISOString,
   comparePasswords,
   clearCookies,
   setCookies,
 } from "../helpers/userHelpers.js";
-import { formatDateToISOString } from "../helpers/userHelpers.js";
 
 // ===== Render Pages ===== //
 
@@ -98,6 +98,13 @@ export const handleUserLogin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid email or password." });
 
+    // Check if user is blocked
+    if (user.accountStatus.isBlocked)
+      return res.status(401).json({
+        success: false,
+        message: "Your account is temporarily blocked",
+      });
+
     const { modifiedCount } = await updateUserData(user.username, {
       "accountStatus.lastLogin": formatDateToISOString(new Date()),
       "accountStatus.isActive": true,
@@ -106,13 +113,6 @@ export const handleUserLogin = async (req, res) => {
       return res.status(500).json({
         success: false,
         message: "Something went wrong. Please login after sometime",
-      });
-
-    // Check if user is blocked
-    if (user.accountStatus.isBlocked)
-      return res.status(401).json({
-        success: false,
-        message: "Your account is temporarily blocked",
       });
 
     // Set JWT cookies
