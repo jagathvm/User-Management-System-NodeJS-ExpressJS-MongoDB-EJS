@@ -1,10 +1,10 @@
 import app from "../../app.js";
 
 export const setLayout = (req, res, next) => {
-  if (req.path.startsWith("/api/admin/dashboard")) {
-    app.set("layout", "./layouts/main");
+  if (req.path.startsWith("/api/admin")) {
+    app.set("layout", "./layouts/admin");
   } else {
-    app.set("layout", false);
+    app.set("layout", "./layouts/user");
   }
   next();
 };
