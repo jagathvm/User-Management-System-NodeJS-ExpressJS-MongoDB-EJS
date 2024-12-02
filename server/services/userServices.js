@@ -48,25 +48,6 @@ export const findUserByCredentials = async (username, email, tel) => {
   }
 };
 
-export const findUsersBySearchCriteria = async (searchCriteria) => {
-  try {
-    const users = await getUsersCollection
-      .find({
-        $or: [
-          { username: searchCriteria },
-          { email: searchCriteria },
-          { tel: searchCriteria },
-        ],
-      })
-      .toArray();
-
-    return users;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
 export const findUsersByFilter = async (
   filter = {},
   sort = {},
@@ -147,7 +128,7 @@ export const updateUserData = async (username, data) => {
   }
 };
 
-export const blockOrUnblockUser = async (username, res, isBlocked) => {
+export const blockOrUnblockUser = async (username, isBlocked) => {
   try {
     // Unblock User
     if (isBlocked === true) {
