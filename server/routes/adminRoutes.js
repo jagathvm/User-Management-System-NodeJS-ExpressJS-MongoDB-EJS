@@ -22,7 +22,7 @@ router.get("/dashboard", adminController.renderDashboardPage);
  * @desc    Render the admin about page
  * @access  Protected
  */
-router.get("/dashboard/about", adminController.renderAboutPage);
+router.get("/about", adminController.renderAboutPage);
 
 /**
  * @route   GET /dashboard/view/:username
@@ -39,13 +39,6 @@ router.get("/dashboard/view/:username", adminController.renderUserDetails);
 router.post("/dashboard/postUser", adminController.handleAddUser);
 
 /**
- * @route   POST /dashboard/searchUser
- * @desc    Handle the search for a user
- * @access  Protected
- */
-router.post("/dashboard/searchUser", adminController.handleSearchUser);
-
-/**
  * @route   PUT /dashboard/view/update/:username
  * @desc    Handle the update of user details
  * @access  Protected
@@ -53,6 +46,16 @@ router.post("/dashboard/searchUser", adminController.handleSearchUser);
 router.put(
   "/dashboard/view/update/:username",
   adminController.handleUpdateUser
+);
+
+/**
+ * @route   PUT /dashboard/view/block/:username
+ * @desc    Handle the blocking/unblocking of a user
+ * @access  Protected
+ */
+router.put(
+  "/dashboard/view/block/:username",
+  adminController.handleBlockOrUnblockUser
 );
 
 /**
