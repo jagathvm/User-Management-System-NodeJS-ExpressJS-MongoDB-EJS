@@ -2,13 +2,13 @@
   <div class="position-sticky sidebar-sticky">
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="/api/admin/dashboard">
+        <a class="nav-link <%= req.path === '/dashboard' ? 'active' : '' %>" aria-current="page" href="/api/admin/dashboard">
           <i class="bi bi-house"></i>
           Dashboard
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/api/admin/dashboard/about">
+        <a class="nav-link <%= req.path === '/about' ? 'active' : '' %>" href="/api/admin/about">
           <i class="bi bi-patch-question"></i>
           About
         </a>
